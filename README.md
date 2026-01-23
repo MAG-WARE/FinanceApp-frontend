@@ -15,42 +15,6 @@ Sistema de gestão financeira pessoal desenvolvido com Next.js 14, TypeScript e 
 - **Lucide React** (Ícones)
 - **date-fns** (Manipulação de datas)
 
-## 📋 Pré-requisitos
-
-- Node.js 18+
-- npm ou yarn
-- Backend da aplicação rodando em `http://localhost:5000/api`
-
-## 🔧 Instalação
-
-1. Clone o repositório:
-```bash
-git clone <url-do-repositorio>
-cd FinanceApp-frontend
-```
-
-2. Instale as dependências:
-```bash
-npm install
-```
-
-3. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env.local
-```
-
-Edite o arquivo `.env.local` se necessário:
-```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-```
-
-4. Execute o servidor de desenvolvimento:
-```bash
-npm run dev
-```
-
-5. Acesse a aplicação em [http://localhost:3000](http://localhost:3000)
-
 ## 📱 Funcionalidades
 
 ### Autenticação
@@ -118,7 +82,7 @@ npm run dev
 
 ```
 app/
-├── (dashboard)/           # Rotas protegidas
+├── (dashboard)/          # Rotas protegidas
 │   ├── layout.tsx        # Layout com sidebar
 │   ├── page.tsx          # Dashboard
 │   ├── accounts/         # Página de contas
@@ -198,29 +162,6 @@ Utiliza **TanStack Query** para:
 - [ ] Dark mode completo
 - [ ] Filtros avançados em transações
 - [ ] Gráficos adicionais no dashboard
-
-## 🛠️ Scripts Disponíveis
-
-```bash
-# Desenvolvimento
-npm run dev
-
-# Build de produção
-npm run build
-
-# Iniciar servidor de produção
-npm run start
-
-# Linting
-npm run lint
-```
-
-## 📝 Notas Importantes
-
-- Certifique-se de que o backend está rodando antes de iniciar o frontend
-- A aplicação é otimizada para 2 usuários compartilhando finanças
-- Todas as datas estão no formato brasileiro (dd/MM/yyyy)
-- Valores monetários formatados com "R$" e separador de milhar
 
 ## 🤝 Contribuindo
 
