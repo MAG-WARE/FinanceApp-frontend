@@ -153,6 +153,7 @@ Utiliza **TanStack Query** para:
 
 ## 🎯 Próximas Melhorias
 
+- [ ] Conta DEMO
 - [ ] PWA / Service Workers
 - [ ] Testes automatizados
 - [ ] Exportação de relatórios PDF
