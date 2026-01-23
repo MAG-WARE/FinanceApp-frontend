@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { transactionsService } from "@/services/transactions.service";
 import { TransactionFilters } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
+import { formatApiError, getErrorDescription } from "@/lib/error-handler";
 
 export function useTransactions(filters?: TransactionFilters) {
   return useQuery({
@@ -25,11 +26,12 @@ export function useCreateTransaction() {
         description: "A transação foi criada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível criar a transação.",
+        title: "Erro ao criar transação",
+        description: getErrorDescription(apiError),
       });
     },
   });
@@ -51,11 +53,12 @@ export function useUpdateTransaction() {
         description: "A transação foi atualizada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível atualizar a transação.",
+        title: "Erro ao atualizar transação",
+        description: getErrorDescription(apiError),
       });
     },
   });
@@ -76,11 +79,12 @@ export function useDeleteTransaction() {
         description: "A transação foi deletada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível deletar a transação.",
+        title: "Erro ao deletar transação",
+        description: getErrorDescription(apiError),
       });
     },
   });

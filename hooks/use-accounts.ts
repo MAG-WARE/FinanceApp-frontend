@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { accountsService } from "@/services/accounts.service";
 import { toast } from "@/hooks/use-toast";
+import { formatApiError, getErrorDescription } from "@/lib/error-handler";
 
 export function useAccounts() {
   return useQuery({
@@ -22,11 +23,12 @@ export function useCreateAccount() {
         description: "A conta foi criada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível criar a conta.",
+        title: "Erro ao criar conta",
+        description: getErrorDescription(apiError),
       });
     },
   });
@@ -46,11 +48,12 @@ export function useUpdateAccount() {
         description: "A conta foi atualizada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível atualizar a conta.",
+        title: "Erro ao atualizar conta",
+        description: getErrorDescription(apiError),
       });
     },
   });
@@ -69,11 +72,12 @@ export function useDeleteAccount() {
         description: "A conta foi deletada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível deletar a conta.",
+        title: "Erro ao deletar conta",
+        description: getErrorDescription(apiError),
       });
     },
   });

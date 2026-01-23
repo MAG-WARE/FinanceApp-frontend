@@ -84,14 +84,12 @@ Sistema de gestão financeira pessoal desenvolvido com Next.js 14, TypeScript e 
 app/
 ├── (dashboard)/          # Rotas protegidas
 │   ├── layout.tsx        # Layout com sidebar
-│   ├── page.tsx          # Dashboard
+│   ├── page.tsx          # Dashboard principal
 │   ├── accounts/         # Página de contas
 │   ├── transactions/     # Página de transações
 │   ├── categories/       # Página de categorias
 │   ├── budgets/          # Página de orçamentos
 │   └── goals/            # Página de metas
-├── login/                # Página de login
-├── register/             # Página de registro
 └── layout.tsx            # Layout raiz
 
 components/

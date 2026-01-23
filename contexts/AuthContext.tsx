@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await authService.login(data);
       authService.storeAuth(response.token, response.user);
       setUser(response.user);
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       throw error;
     }
@@ -49,7 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const response = await authService.register(data);
       authService.storeAuth(response.token, response.user);
       setUser(response.user);
-      router.push("/");
+      router.push("/dashboard");
     } catch (error) {
       throw error;
     }
