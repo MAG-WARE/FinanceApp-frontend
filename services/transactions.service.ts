@@ -8,19 +8,19 @@ import {
 
 export const transactionsService = {
   getAll: async (filters?: TransactionFilters): Promise<Transaction[]> => {
-    const response = await api.get<Transaction[]>("/transactions", {
+    const response = await api.get<Transaction[]>("/transaction", {
       params: filters,
     });
     return response.data;
   },
 
   getById: async (id: string): Promise<Transaction> => {
-    const response = await api.get<Transaction>(`/transactions/${id}`);
+    const response = await api.get<Transaction>(`/transaction/${id}`);
     return response.data;
   },
 
   create: async (data: CreateTransactionDto): Promise<Transaction> => {
-    const response = await api.post<Transaction>("/transactions", data);
+    const response = await api.post<Transaction>("/transaction", data);
     return response.data;
   },
 
@@ -28,11 +28,11 @@ export const transactionsService = {
     id: string,
     data: UpdateTransactionDto
   ): Promise<Transaction> => {
-    const response = await api.put<Transaction>(`/transactions/${id}`, data);
+    const response = await api.put<Transaction>(`/transaction/${id}`, data);
     return response.data;
   },
 
   delete: async (id: string): Promise<void> => {
-    await api.delete(`/transactions/${id}`);
+    await api.delete(`/transaction/${id}`);
   },
 };
