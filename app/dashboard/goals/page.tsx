@@ -6,12 +6,28 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
-import { Plus, Target } from "lucide-react";
+import { Plus, Target, Pencil } from "lucide-react";
 import { GoalDialog } from "@/components/goals/goal-dialog";
+import { Goal } from "@/lib/types";
 
 export default function GoalsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
   const { data: goals, isLoading } = useGoals();
+
+  const handleOpenDialog = (goal?: Goal) => {
+    if (goal) {
+      setSelectedGoal(goal);
+    } else {
+      setSelectedGoal(null);
+    }
+    setIsDialogOpen(true);
+  };
+
+  const handleCloseDialog = () => {
+    setIsDialogOpen(false);
+    setSelectedGoal(null);
+  };
 
   return (
     <div className="space-y-6">
@@ -22,7 +38,7 @@ export default function GoalsPage() {
             Acompanhe o progresso das suas metas financeiras
           </p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => handleOpenDialog()}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Meta
         </Button>
@@ -39,7 +55,17 @@ export default function GoalsPage() {
                 <CardHeader>
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{goal.name}</CardTitle>
-                    {isCompleted && <Badge className="bg-green-500">Concluída</Badge>}
+                    <div className="flex items-center gap-2">
+                      {isCompleted && <Badge className="bg-green-500">Concluída</Badge>}
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleOpenDialog(goal)}
+                        className="h-8 w-8 p-0"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                   {goal.description && (
                     <p className="text-sm text-muted-foreground">{goal.description}</p>
@@ -82,7 +108,7 @@ export default function GoalsPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Target className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground">Nenhuma meta cadastrada</p>
-            <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
+            <Button className="mt-4" onClick={() => handleOpenDialog()}>
               <Plus className="mr-2 h-4 w-4" />
               Criar primeira meta
             </Button>
@@ -92,7 +118,8 @@ export default function GoalsPage() {
 
       <GoalDialog
         open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
+        onOpenChange={handleCloseDialog}
+        goal={selectedGoal}
       />
     </div>
   );
