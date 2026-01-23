@@ -54,13 +54,14 @@ export function BudgetDialog({ open, onOpenChange, budget, defaultMonth, default
       setValue("month", budget.month);
       setValue("year", budget.year);
       setValue("limitAmount", budget.limitAmount);
-    } else {
+    } else if (!budget && open) {
+      const now = new Date();
       reset({
-        month: defaultMonth || currentDate.getMonth() + 1,
-        year: defaultYear || currentDate.getFullYear(),
+        month: defaultMonth || now.getMonth() + 1,
+        year: defaultYear || now.getFullYear(),
       });
     }
-  }, [budget, defaultMonth, defaultYear, setValue, reset, currentDate]);
+  }, [budget, defaultMonth, defaultYear, open, setValue, reset]);
 
   const onSubmit = async (data: BudgetFormData) => {
     try {

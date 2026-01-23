@@ -18,10 +18,19 @@ export function formatApiError(error: unknown): ApiError {
     // Mensagens específicas por código de status
     switch (statusCode) {
       case 400:
+        const errors = error.response?.data?.errors;
+        let errorDetails = details;
+        if (errors) {
+          if (Array.isArray(errors)) {
+            errorDetails = errors.join(", ");
+          } else if (typeof errors === "object") {
+            errorDetails = Object.values(errors).flat().join(", ");
+          }
+        }
         return {
           message: serverMessage || "Dados inválidos enviados ao servidor",
           statusCode,
-          details: details || error.response?.data?.errors?.join(", "),
+          details: errorDetails,
         };
 
       case 401:

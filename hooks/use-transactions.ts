@@ -43,11 +43,14 @@ export function useUpdateTransaction() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       transactionsService.update(id, data),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["transactions"] });
-      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
-      queryClient.invalidateQueries({ queryKey: ["accounts"] });
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+    onSuccess: async () => {
+      // Refetch ao invés de invalidate para garantir dados atualizados imediatamente
+      await Promise.all([
+        queryClient.refetchQueries({ queryKey: ["transactions"] }),
+        queryClient.refetchQueries({ queryKey: ["dashboard"] }),
+        queryClient.refetchQueries({ queryKey: ["accounts"] }),
+        queryClient.refetchQueries({ queryKey: ["budgets"] }),
+      ]);
       toast({
         title: "Transação atualizada!",
         description: "A transação foi atualizada com sucesso.",
