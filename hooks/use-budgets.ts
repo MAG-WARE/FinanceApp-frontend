@@ -3,6 +3,13 @@ import { budgetsService } from "@/services/budgets.service";
 import { toast } from "@/hooks/use-toast";
 import { formatApiError, getErrorDescription } from "@/lib/error-handler";
 
+export function useBudgets() {
+  return useQuery({
+    queryKey: ["budgets"],
+    queryFn: () => budgetsService.getAll(),
+  });
+}
+
 export function useBudgetsByMonth(year: number, month: number) {
   return useQuery({
     queryKey: ["budgets", "month", year, month],
