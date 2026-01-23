@@ -24,32 +24,32 @@ const menuItems = [
   {
     label: "Dashboard",
     icon: LayoutDashboard,
-    href: "/",
+    href: "/dashboard",
   },
   {
     label: "Transações",
     icon: Receipt,
-    href: "/transactions",
+    href: "/dashboard/transactions",
   },
   {
     label: "Contas",
     icon: CreditCard,
-    href: "/accounts",
+    href: "/dashboard/accounts",
   },
   {
     label: "Categorias",
     icon: Tag,
-    href: "/categories",
+    href: "/dashboard/categories",
   },
   {
     label: "Orçamentos",
     icon: PiggyBank,
-    href: "/budgets",
+    href: "/dashboard/budgets",
   },
   {
     label: "Metas",
     icon: Target,
-    href: "/goals",
+    href: "/dashboard/goals",
   },
 ];
 
