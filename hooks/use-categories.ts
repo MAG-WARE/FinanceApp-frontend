@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { categoriesService } from "@/services/categories.service";
 import { toast } from "@/hooks/use-toast";
+import { formatApiError, getErrorDescription } from "@/lib/error-handler";
 
 export function useCategories() {
   return useQuery({
@@ -21,11 +22,12 @@ export function useCreateCategory() {
         description: "A categoria foi criada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível criar a categoria.",
+        title: "Erro ao criar categoria",
+        description: getErrorDescription(apiError),
       });
     },
   });
@@ -44,11 +46,12 @@ export function useUpdateCategory() {
         description: "A categoria foi atualizada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível atualizar a categoria.",
+        title: "Erro ao atualizar categoria",
+        description: getErrorDescription(apiError),
       });
     },
   });
@@ -66,11 +69,12 @@ export function useDeleteCategory() {
         description: "A categoria foi deletada com sucesso.",
       });
     },
-    onError: () => {
+    onError: (error) => {
+      const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro",
-        description: "Não foi possível deletar a categoria.",
+        title: "Erro ao deletar categoria",
+        description: getErrorDescription(apiError),
       });
     },
   });
