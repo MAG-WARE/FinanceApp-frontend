@@ -59,6 +59,30 @@ export function useUpdateAccount() {
   });
 }
 
+export function useToggleAccountStatus() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: accountsService.toggleActive,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["accounts"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] });
+      toast({
+        title: "Status atualizado!",
+        description: "O status da conta foi alterado com sucesso.",
+      });
+    },
+    onError: (error) => {
+      const apiError = formatApiError(error);
+      toast({
+        variant: "destructive",
+        title: "Erro ao alterar status",
+        description: getErrorDescription(apiError),
+      });
+    },
+  });
+}
+
 export function useDeleteAccount() {
   const queryClient = useQueryClient();
 

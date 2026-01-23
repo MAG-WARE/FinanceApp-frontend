@@ -49,6 +49,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
       name: "",
       type: AccountType.CheckingAccount,
       initialBalance: 0,
+      isActive: true,
       color: "#6366f1",
     },
   });
@@ -58,12 +59,14 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
       setValue("name", account.name);
       setValue("type", account.type);
       setValue("initialBalance", account.initialBalance);
+      setValue("isActive", account.isActive);
       setValue("color", account.color || "#6366f1");
     } else {
       reset({
         name: "",
         type: AccountType.CheckingAccount,
         initialBalance: 0,
+        isActive: true,
         color: "#6366f1",
       });
     }

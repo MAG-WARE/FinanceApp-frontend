@@ -11,6 +11,24 @@ export const transactionSchema = z.object({
   notes: z.string().optional(),
   isRecurring: z.boolean().default(false),
   destinationAccountId: z.string().optional(),
+}).refine((data) => {
+  // Para transferências, a conta de destino é obrigatória
+  if (data.type === TransactionType.Transfer && !data.destinationAccountId) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Conta de destino é obrigatória para transferências",
+  path: ["destinationAccountId"],
+}).refine((data) => {
+  // Para transferências, a conta de destino deve ser diferente da conta de origem
+  if (data.type === TransactionType.Transfer && data.destinationAccountId === data.accountId) {
+    return false;
+  }
+  return true;
+}, {
+  message: "A conta de destino deve ser diferente da conta de origem",
+  path: ["destinationAccountId"],
 });
 
 export type TransactionFormData = z.infer<typeof transactionSchema>;

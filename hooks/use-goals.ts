@@ -1,79 +1,79 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { budgetsService } from "@/services/budgets.service";
+import { goalsService } from "@/services/goals.service";
 import { toast } from "@/hooks/use-toast";
 import { formatApiError, getErrorDescription } from "@/lib/error-handler";
 
-export function useBudgetsByMonth(year: number, month: number) {
+export function useGoals() {
   return useQuery({
-    queryKey: ["budgets", "month", year, month],
-    queryFn: () => budgetsService.getByMonth(year, month),
+    queryKey: ["goals"],
+    queryFn: goalsService.getAll,
   });
 }
 
-export function useCreateBudget() {
+export function useCreateGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: budgetsService.create,
+    mutationFn: goalsService.create,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
       toast({
-        title: "Orçamento criado!",
-        description: "O orçamento foi criado com sucesso.",
+        title: "Meta criada!",
+        description: "A meta foi criada com sucesso.",
       });
     },
     onError: (error) => {
       const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro ao criar orçamento",
+        title: "Erro ao criar meta",
         description: getErrorDescription(apiError),
       });
     },
   });
 }
 
-export function useUpdateBudget() {
+export function useUpdateGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
-      budgetsService.update(id, data),
+      goalsService.update(id, data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
       toast({
-        title: "Orçamento atualizado!",
-        description: "O orçamento foi atualizado com sucesso.",
+        title: "Meta atualizada!",
+        description: "A meta foi atualizada com sucesso.",
       });
     },
     onError: (error) => {
       const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro ao atualizar orçamento",
+        title: "Erro ao atualizar meta",
         description: getErrorDescription(apiError),
       });
     },
   });
 }
 
-export function useDeleteBudget() {
+export function useDeleteGoal() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: budgetsService.delete,
+    mutationFn: goalsService.delete,
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
       toast({
-        title: "Orçamento deletado!",
-        description: "O orçamento foi deletado com sucesso.",
+        title: "Meta deletada!",
+        description: "A meta foi deletada com sucesso.",
       });
     },
     onError: (error) => {
       const apiError = formatApiError(error);
       toast({
         variant: "destructive",
-        title: "Erro ao deletar orçamento",
+        title: "Erro ao deletar meta",
         description: getErrorDescription(apiError),
       });
     },

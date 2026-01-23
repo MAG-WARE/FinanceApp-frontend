@@ -7,6 +7,7 @@ export const accountSchema = z.object({
     errorMap: () => ({ message: "Selecione um tipo de conta" }),
   }),
   initialBalance: z.number().min(0, "Saldo inicial não pode ser negativo"),
+  isActive: z.boolean().optional(),
   color: z.string().optional(),
   icon: z.string().optional(),
 });

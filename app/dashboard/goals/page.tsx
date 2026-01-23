@@ -1,18 +1,17 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
-import { goalsService } from "@/services/goals.service";
+import { useState } from "react";
+import { useGoals } from "@/hooks/use-goals";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
 import { Plus, Target } from "lucide-react";
+import { GoalDialog } from "@/components/goals/goal-dialog";
 
 export default function GoalsPage() {
-  const { data: goals, isLoading } = useQuery({
-    queryKey: ["goals"],
-    queryFn: goalsService.getAll,
-  });
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { data: goals, isLoading } = useGoals();
 
   return (
     <div className="space-y-6">
@@ -23,7 +22,7 @@ export default function GoalsPage() {
             Acompanhe o progresso das suas metas financeiras
           </p>
         </div>
-        <Button>
+        <Button onClick={() => setIsDialogOpen(true)}>
           <Plus className="mr-2 h-4 w-4" />
           Nova Meta
         </Button>
@@ -83,13 +82,18 @@ export default function GoalsPage() {
           <CardContent className="flex flex-col items-center justify-center py-12">
             <Target className="h-12 w-12 text-muted-foreground mb-4" />
             <p className="text-muted-foreground">Nenhuma meta cadastrada</p>
-            <Button className="mt-4">
+            <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
               <Plus className="mr-2 h-4 w-4" />
               Criar primeira meta
             </Button>
           </CardContent>
         </Card>
       )}
+
+      <GoalDialog
+        open={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+      />
     </div>
   );
 }

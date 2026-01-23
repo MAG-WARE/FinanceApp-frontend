@@ -39,8 +39,10 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
   });
 
   const transactionType = watch("type");
+  const selectedAccountId = watch("accountId");
   const selectedCategoryType = transactionType === TransactionType.Income ? CategoryType.Income : CategoryType.Expense;
   const filteredCategories = categories?.filter(c => c.type === selectedCategoryType);
+  const isTransfer = transactionType === TransactionType.Transfer;
 
   useEffect(() => {
     if (transaction) {
@@ -52,6 +54,9 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
       setValue("type", transaction.type);
       setValue("notes", transaction.notes || "");
       setValue("isRecurring", transaction.isRecurring);
+      if (transaction.destinationAccountId) {
+        setValue("destinationAccountId", transaction.destinationAccountId);
+      }
     } else {
       reset({
         type: TransactionType.Expense,
@@ -119,7 +124,7 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="accountId">Conta</Label>
+              <Label htmlFor="accountId">Conta {isTransfer && "de Origem"}</Label>
               <Select
                 value={watch("accountId")}
                 onValueChange={(value) => setValue("accountId", value)}
@@ -154,6 +159,29 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
               {errors.categoryId && <p className="text-sm text-red-500">{errors.categoryId.message}</p>}
             </div>
           </div>
+
+          {isTransfer && (
+            <div className="space-y-2">
+              <Label htmlFor="destinationAccountId">Conta de Destino</Label>
+              <Select
+                value={watch("destinationAccountId")}
+                onValueChange={(value) => setValue("destinationAccountId", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione a conta de destino" />
+                </SelectTrigger>
+                <SelectContent>
+                  {accounts
+                    ?.filter(a => a.isActive && a.id !== selectedAccountId)
+                    .map(account => (
+                      <SelectItem key={account.id} value={account.id}>{account.name}</SelectItem>
+                    ))
+                  }
+                </SelectContent>
+              </Select>
+              {errors.destinationAccountId && <p className="text-sm text-red-500">{errors.destinationAccountId.message}</p>}
+            </div>
+          )}
 
           <div className="space-y-2">
             <Label htmlFor="date">Data</Label>

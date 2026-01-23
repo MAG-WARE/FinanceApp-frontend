@@ -108,6 +108,7 @@ export interface CreateCategoryDto {
 
 export interface UpdateCategoryDto {
   name?: string;
+  type?: CategoryType;
   color?: string;
   icon?: string;
 }

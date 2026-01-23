@@ -22,6 +22,11 @@ export const accountsService = {
     return response.data;
   },
 
+  toggleActive: async (id: string): Promise<Account> => {
+    const response = await api.patch<Account>(`/account/${id}/toggle-active`);
+    return response.data;
+  },
+
   delete: async (id: string): Promise<void> => {
     await api.delete(`/account/${id}`);
   },

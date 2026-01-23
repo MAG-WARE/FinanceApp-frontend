@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAccounts, useDeleteAccount, useUpdateAccount } from "@/hooks/use-accounts";
+import { useAccounts, useDeleteAccount, useUpdateAccount, useToggleAccountStatus } from "@/hooks/use-accounts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,6 +31,7 @@ export default function AccountsPage() {
   const { data: accounts, isLoading } = useAccounts();
   const deleteAccountMutation = useDeleteAccount();
   const updateAccountMutation = useUpdateAccount();
+  const toggleAccountStatusMutation = useToggleAccountStatus();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -56,10 +57,7 @@ export default function AccountsPage() {
   };
 
   const handleToggleActive = async (account: Account) => {
-    await updateAccountMutation.mutateAsync({
-      id: account.id,
-      data: { isActive: !account.isActive },
-    });
+    await toggleAccountStatusMutation.mutateAsync(account.id);
   };
 
   const handleCloseDialog = () => {
