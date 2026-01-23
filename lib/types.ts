@@ -1,4 +1,3 @@
-// Enums do backend
 export enum AccountType {
   CheckingAccount = 1,
   SavingsAccount = 2,
@@ -18,7 +17,6 @@ export enum CategoryType {
   Expense = 2,
 }
 
-// Interfaces principais
 export interface User {
   id: string;
   name: string;
@@ -84,7 +82,6 @@ export interface Goal {
   icon?: string;
 }
 
-// DTOs para criação/atualização
 export interface CreateAccountDto {
   name: string;
   type: AccountType;
@@ -173,7 +170,6 @@ export interface UpdateGoalDto {
   icon?: string;
 }
 
-// Auth DTOs
 export interface LoginDto {
   email: string;
   password: string;
@@ -190,7 +186,6 @@ export interface AuthResponse {
   user: User;
 }
 
-// Dashboard DTOs
 export interface DashboardSummary {
   totalIncome: number;
   totalExpense: number;
@@ -211,7 +206,6 @@ export interface BalanceEvolution {
   balance: number;
 }
 
-// Query filters
 export interface TransactionFilters {
   startDate?: string;
   endDate?: string;
@@ -220,7 +214,6 @@ export interface TransactionFilters {
   type?: TransactionType;
 }
 
-// Utility types
 export const AccountTypeLabels: Record<AccountType, string> = {
   [AccountType.CheckingAccount]: "Conta Corrente",
   [AccountType.SavingsAccount]: "Conta Poupança",
