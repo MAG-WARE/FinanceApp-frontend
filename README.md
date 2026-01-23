@@ -19,7 +19,7 @@ Sistema de gestão financeira pessoal desenvolvido com Next.js 14, TypeScript e 
 
 - Node.js 18+
 - npm ou yarn
-- Backend da aplicação rodando em `http://localhost:5000/api`
+- Backend da aplicação rodando em `https://localhost:5001/api`
 
 ## 🔧 Instalação
 
@@ -35,13 +35,10 @@ npm install
 ```
 
 3. Configure as variáveis de ambiente:
-```bash
-cp .env.example .env.local
-```
 
-Edite o arquivo `.env.local` se necessário:
+Crie o arquivo `.env.local` na raiz do projeto:
 ```env
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
+NEXT_PUBLIC_API_URL=https://localhost:5001/api
 ```
 
 4. Execute o servidor de desenvolvimento:
@@ -118,16 +115,17 @@ npm run dev
 
 ```
 app/
-├── (dashboard)/           # Rotas protegidas
+├── page.tsx              # Landing page (página inicial pública)
+├── login/                # Página de login
+├── register/             # Página de registro
+├── dashboard/            # Rotas protegidas do dashboard
 │   ├── layout.tsx        # Layout com sidebar
-│   ├── page.tsx          # Dashboard
+│   ├── page.tsx          # Dashboard principal
 │   ├── accounts/         # Página de contas
 │   ├── transactions/     # Página de transações
 │   ├── categories/       # Página de categorias
 │   ├── budgets/          # Página de orçamentos
 │   └── goals/            # Página de metas
-├── login/                # Página de login
-├── register/             # Página de registro
 └── layout.tsx            # Layout raiz
 
 components/
