@@ -28,7 +28,9 @@ export const transactionsService = {
     id: string,
     data: UpdateTransactionDto
   ): Promise<Transaction> => {
+    console.log("🔄 Updating transaction:", id, data);
     const response = await api.put<Transaction>(`/transaction/${id}`, data);
+    console.log("✅ Transaction updated response:", response.data);
     return response.data;
   },
 

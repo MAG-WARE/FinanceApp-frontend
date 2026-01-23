@@ -67,10 +67,18 @@ export function GoalDialog({ open, onOpenChange, goal }: GoalDialogProps) {
 
   const onSubmit = async (data: GoalFormData) => {
     try {
+      // Limpar campos de data vazios (converter "" para undefined)
+      const payload = {
+        ...data,
+        targetDate: data.targetDate && data.targetDate.trim() !== "" ? data.targetDate : undefined,
+        description: data.description && data.description.trim() !== "" ? data.description : undefined,
+        color: data.color && data.color.trim() !== "" ? data.color : undefined,
+      };
+
       if (isEditing) {
-        await updateMutation.mutateAsync({ id: goal.id, data });
+        await updateMutation.mutateAsync({ id: goal.id, data: payload });
       } else {
-        await createMutation.mutateAsync(data);
+        await createMutation.mutateAsync(payload);
       }
       onOpenChange(false);
       reset();

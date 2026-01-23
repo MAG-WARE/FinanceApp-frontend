@@ -43,7 +43,10 @@ export function useUpdateTransaction() {
   return useMutation({
     mutationFn: ({ id, data }: { id: string; data: any }) =>
       transactionsService.update(id, data),
-    onSuccess: async () => {
+    onSuccess: async (updatedTransaction) => {
+      console.log("🔄 Mutation success, refetching queries...");
+      console.log("📊 Updated transaction from server:", updatedTransaction);
+
       // Refetch ao invés de invalidate para garantir dados atualizados imediatamente
       await Promise.all([
         queryClient.refetchQueries({ queryKey: ["transactions"] }),
@@ -51,12 +54,16 @@ export function useUpdateTransaction() {
         queryClient.refetchQueries({ queryKey: ["accounts"] }),
         queryClient.refetchQueries({ queryKey: ["budgets"] }),
       ]);
+
+      console.log("✅ All queries refetched");
+
       toast({
         title: "Transação atualizada!",
         description: "A transação foi atualizada com sucesso.",
       });
     },
     onError: (error) => {
+      console.error("❌ Error updating transaction:", error);
       const apiError = formatApiError(error);
       toast({
         variant: "destructive",
