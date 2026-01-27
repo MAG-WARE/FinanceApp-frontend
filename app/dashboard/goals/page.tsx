@@ -2,18 +2,26 @@
 
 import { useState } from "react";
 import { useGoals } from "@/hooks/use-goals";
+import { useTransactions } from "@/hooks/use-transactions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
-import { Plus, Target, Pencil } from "lucide-react";
+import { Plus, Target, Pencil, ChevronDown, ChevronUp, ArrowUpRight } from "lucide-react";
 import { GoalDialog } from "@/components/goals/goal-dialog";
 import { Goal } from "@/lib/types";
 
 export default function GoalsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedGoal, setSelectedGoal] = useState<Goal | null>(null);
+  const [expandedGoalId, setExpandedGoalId] = useState<string | null>(null);
   const { data: goals, isLoading } = useGoals();
+  const { data: transactions } = useTransactions();
+
+  // Agrupar transações por meta
+  const getTransactionsForGoal = (goalId: string) => {
+    return transactions?.filter(t => t.goalId === goalId) || [];
+  };
 
   const handleOpenDialog = (goal?: Goal) => {
     if (goal) {
@@ -97,6 +105,44 @@ export default function GoalsPage() {
                     <p className="text-xs text-muted-foreground text-center">
                       Data alvo: {formatDate(goal.targetDate)}
                     </p>
+                  )}
+
+                  {/* Transações vinculadas */}
+                  {getTransactionsForGoal(goal.id).length > 0 && (
+                    <div className="pt-2 border-t">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-between text-xs"
+                        onClick={() => setExpandedGoalId(expandedGoalId === goal.id ? null : goal.id)}
+                      >
+                        <span className="flex items-center gap-1">
+                          <ArrowUpRight className="h-3 w-3" />
+                          {getTransactionsForGoal(goal.id).length} transação(ões) vinculada(s)
+                        </span>
+                        {expandedGoalId === goal.id ? (
+                          <ChevronUp className="h-3 w-3" />
+                        ) : (
+                          <ChevronDown className="h-3 w-3" />
+                        )}
+                      </Button>
+
+                      {expandedGoalId === goal.id && (
+                        <div className="mt-2 space-y-2 max-h-40 overflow-y-auto">
+                          {getTransactionsForGoal(goal.id).map(transaction => (
+                            <div key={transaction.id} className="flex justify-between items-center text-xs p-2 bg-muted rounded">
+                              <div>
+                                <p className="font-medium">{transaction.description}</p>
+                                <p className="text-muted-foreground">{formatDate(transaction.date)}</p>
+                              </div>
+                              <span className="font-bold text-green-500">
+                                +{formatCurrency(transaction.amount)}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   )}
                 </CardContent>
               </Card>

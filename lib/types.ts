@@ -57,6 +57,8 @@ export interface Transaction {
   notes?: string;
   destinationAccountId?: string;
   destinationAccountName?: string;
+  goalId?: string;
+  goalName?: string;
 }
 
 export interface Budget {
@@ -123,6 +125,7 @@ export interface CreateTransactionDto {
   isRecurring?: boolean;
   notes?: string;
   destinationAccountId?: string;
+  goalId?: string;
 }
 
 export interface UpdateTransactionDto {
@@ -135,6 +138,7 @@ export interface UpdateTransactionDto {
   isRecurring?: boolean;
   notes?: string;
   destinationAccountId?: string;
+  goalId?: string | null;
 }
 
 export interface CreateBudgetDto {
@@ -213,6 +217,7 @@ export interface TransactionFilters {
   accountId?: string;
   categoryId?: string;
   type?: TransactionType;
+  goalId?: string;
 }
 
 export const AccountTypeLabels: Record<AccountType, string> = {

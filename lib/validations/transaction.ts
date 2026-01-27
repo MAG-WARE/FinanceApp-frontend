@@ -11,6 +11,7 @@ export const transactionSchema = z.object({
   notes: z.string().optional(),
   isRecurring: z.boolean().default(false),
   destinationAccountId: z.string().optional(),
+  goalId: z.string().optional().nullable(),
 }).refine((data) => {
   // Para transferências, a conta de destino é obrigatória
   if (data.type === TransactionType.Transfer && !data.destinationAccountId) {

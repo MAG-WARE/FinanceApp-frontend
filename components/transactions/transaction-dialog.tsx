@@ -7,13 +7,14 @@ import { transactionSchema, TransactionFormData } from "@/lib/validations/transa
 import { useCreateTransaction, useUpdateTransaction } from "@/hooks/use-transactions";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useCategories } from "@/hooks/use-categories";
+import { useGoals } from "@/hooks/use-goals";
 import { Transaction, TransactionType, TransactionTypeLabels, CategoryType } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Target } from "lucide-react";
 import { format } from "date-fns";
 
 interface TransactionDialogProps {
@@ -27,7 +28,11 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
   const updateMutation = useUpdateTransaction();
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
+  const { data: goals } = useGoals();
   const isEditing = !!transaction;
+
+  // Filtrar apenas metas ativas (não concluídas)
+  const activeGoals = goals?.filter(g => !g.isCompleted);
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<TransactionFormData>({
     resolver: zodResolver(transactionSchema),
@@ -57,11 +62,17 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
       if (transaction.destinationAccountId) {
         setValue("destinationAccountId", transaction.destinationAccountId);
       }
+      if (transaction.goalId) {
+        setValue("goalId", transaction.goalId);
+      } else {
+        setValue("goalId", undefined);
+      }
     } else {
       reset({
         type: TransactionType.Expense,
         date: format(new Date(), "yyyy-MM-dd"),
         isRecurring: false,
+        goalId: undefined,
       });
     }
   }, [transaction, setValue, reset]);
@@ -192,6 +203,40 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
           <div className="space-y-2">
             <Label htmlFor="notes">Observações (opcional)</Label>
             <Input id="notes" placeholder="Notas adicionais" {...register("notes")} />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="goalId" className="flex items-center gap-2">
+              <Target className="h-4 w-4" />
+              Meta (opcional)
+            </Label>
+            <Select
+              value={watch("goalId") || "none"}
+              onValueChange={(value) => setValue("goalId", value === "none" ? undefined : value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Vincular a uma meta" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma meta</SelectItem>
+                {activeGoals?.map(goal => (
+                  <SelectItem key={goal.id} value={goal.id}>
+                    {goal.name} ({Math.round((goal.currentAmount / goal.targetAmount) * 100)}%)
+                  </SelectItem>
+                ))}
+                {/* Mostrar meta atual mesmo se concluída (para edição) */}
+                {isEditing && transaction?.goalId && !activeGoals?.find(g => g.id === transaction.goalId) && (
+                  goals?.filter(g => g.id === transaction.goalId).map(goal => (
+                    <SelectItem key={goal.id} value={goal.id}>
+                      {goal.name} (concluída)
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Ao vincular, o valor será adicionado ao progresso da meta
+            </p>
           </div>
 
           <div className="flex justify-end gap-2 pt-4">

@@ -21,6 +21,7 @@ export function useCreateTransaction() {
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
       toast({
         title: "Transação criada!",
         description: "A transação foi criada com sucesso.",
@@ -53,6 +54,7 @@ export function useUpdateTransaction() {
         queryClient.refetchQueries({ queryKey: ["dashboard"] }),
         queryClient.refetchQueries({ queryKey: ["accounts"] }),
         queryClient.refetchQueries({ queryKey: ["budgets"] }),
+        queryClient.refetchQueries({ queryKey: ["goals"] }),
       ]);
 
       console.log("✅ All queries refetched");
@@ -84,6 +86,7 @@ export function useDeleteTransaction() {
       queryClient.invalidateQueries({ queryKey: ["dashboard"] });
       queryClient.invalidateQueries({ queryKey: ["accounts"] });
       queryClient.invalidateQueries({ queryKey: ["budgets"] });
+      queryClient.invalidateQueries({ queryKey: ["goals"] });
       toast({
         title: "Transação deletada!",
         description: "A transação foi deletada com sucesso.",

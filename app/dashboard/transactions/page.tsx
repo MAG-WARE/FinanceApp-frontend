@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
 import { Transaction, TransactionType, TransactionTypeLabels } from "@/lib/types";
-import { Plus, Pencil, Trash2, Filter } from "lucide-react";
+import { Plus, Pencil, Trash2, Filter, Target } from "lucide-react";
 import { TransactionDialog } from "@/components/transactions/transaction-dialog";
 import {
   AlertDialog,
@@ -107,7 +107,15 @@ export default function TransactionsPage() {
                 <TableRow key={transaction.id}>
                   <TableCell>{formatDate(transaction.date)}</TableCell>
                   <TableCell className="font-medium">
-                    {transaction.description}
+                    <div className="flex flex-col gap-1">
+                      {transaction.description}
+                      {transaction.goalName && (
+                        <Badge variant="outline" className="w-fit text-xs text-purple-600 border-purple-300">
+                          <Target className="h-3 w-3 mr-1" />
+                          {transaction.goalName}
+                        </Badge>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>{transaction.categoryName}</TableCell>
                   <TableCell>{transaction.accountName}</TableCell>
