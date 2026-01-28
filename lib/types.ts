@@ -191,25 +191,46 @@ export interface AuthResponse {
   user: User;
 }
 
-export interface DashboardSummary {
-  totalIncome: number;
-  totalExpense: number;
-  balance: number;
-  month: number;
-  year: number;
-}
-
 export interface CategorySpending {
   categoryId: string;
   categoryName: string;
   amount: number;
+  percentage: number;
   color?: string;
 }
 
-export interface BalanceEvolution {
-  date: string;
+export interface MonthlyBalance {
+  month: number;
+  year: number;
+  income: number;
+  expenses: number;
   balance: number;
 }
+
+export interface DashboardComparison {
+  currentMonthIncome: number;
+  previousMonthIncome: number;
+  incomeChange: number;
+  incomeChangePercentage: number;
+  currentMonthExpenses: number;
+  previousMonthExpenses: number;
+  expensesChange: number;
+  expensesChangePercentage: number;
+}
+
+export interface DashboardSummary {
+  totalIncome: number;
+  totalExpenses: number;
+  balance: number;
+  month: number;
+  year: number;
+  topSpendingCategories: CategorySpending[];
+  balanceHistory: MonthlyBalance[];
+  comparison: DashboardComparison;
+}
+
+// Legacy type alias for backwards compatibility
+export type BalanceEvolution = MonthlyBalance;
 
 export interface TransactionFilters {
   startDate?: string;

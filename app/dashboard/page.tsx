@@ -79,7 +79,7 @@ export default function DashboardPage() {
               <Skeleton className="h-8 w-32" />
             ) : (
               <div className="text-2xl font-bold text-red-500">
-                {formatCurrency(summary?.totalExpense || 0)}
+                {formatCurrency(summary?.totalExpenses || 0)}
               </div>
             )}
           </CardContent>
@@ -127,7 +127,7 @@ export default function DashboardPage() {
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${((percent ?? 0) * 100).toFixed(0)}%`
                     }
                     outerRadius={80}
                     fill="#8884d8"
@@ -163,13 +163,23 @@ export default function DashboardPage() {
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={balanceEvolution}>
                   <XAxis
-                    dataKey="date"
-                    tickFormatter={(value) => formatDate(value)}
+                    dataKey="month"
+                    tickFormatter={(month, index) => {
+                      const item = balanceEvolution[index];
+                      if (!item) return `${month}`;
+                      return `${month}/${item.year}`;
+                    }}
                   />
                   <YAxis tickFormatter={(value) => formatCurrency(value)} />
                   <Tooltip
                     formatter={(value) => formatCurrency(Number(value))}
-                    labelFormatter={(label) => formatDate(label)}
+                    labelFormatter={(_, payload) => {
+                      if (payload && payload[0]) {
+                        const item = payload[0].payload;
+                        return `${item.month}/${item.year}`;
+                      }
+                      return "";
+                    }}
                   />
                   <Legend />
                   <Line

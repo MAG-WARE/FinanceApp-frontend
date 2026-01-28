@@ -1,9 +1,5 @@
 import api from "@/lib/api";
-import {
-  DashboardSummary,
-  CategorySpending,
-  BalanceEvolution,
-} from "@/lib/types";
+import { DashboardSummary } from "@/lib/types";
 
 export const dashboardService = {
   getSummary: async (): Promise<DashboardSummary> => {
@@ -18,30 +14,27 @@ export const dashboardService = {
     }
   },
 
-  getByCategory: async (): Promise<CategorySpending[]> => {
-    console.log("🔍 [dashboardService] Fetching by-category...");
+  getSummaryByMonth: async (
+    year: number,
+    month: number
+  ): Promise<DashboardSummary> => {
+    console.log(
+      `🔍 [dashboardService] Fetching summary for ${year}/${month}...`
+    );
     try {
-      const response = await api.get<CategorySpending[]>(
-        "/dashboard/by-category"
+      const response = await api.get<DashboardSummary>(
+        `/dashboard/summary/${year}/${month}`
       );
-      console.log("✅ [dashboardService] By-category fetched:", response.data);
+      console.log(
+        "✅ [dashboardService] Summary by month fetched:",
+        response.data
+      );
       return response.data;
     } catch (error) {
-      console.error("❌ [dashboardService] Error fetching by-category:", error);
-      throw error;
-    }
-  },
-
-  getBalanceEvolution: async (): Promise<BalanceEvolution[]> => {
-    console.log("🔍 [dashboardService] Fetching balance-evolution...");
-    try {
-      const response = await api.get<BalanceEvolution[]>(
-        "/dashboard/balance-evolution"
+      console.error(
+        "❌ [dashboardService] Error fetching summary by month:",
+        error
       );
-      console.log("✅ [dashboardService] Balance-evolution fetched:", response.data);
-      return response.data;
-    } catch (error) {
-      console.error("❌ [dashboardService] Error fetching balance-evolution:", error);
       throw error;
     }
   },

@@ -8,16 +8,34 @@ export function useDashboardSummary() {
   });
 }
 
-export function useDashboardByCategory() {
+export function useDashboardSummaryByMonth(year: number, month: number) {
   return useQuery({
-    queryKey: ["dashboard", "by-category"],
-    queryFn: dashboardService.getByCategory,
+    queryKey: ["dashboard", "summary", year, month],
+    queryFn: () => dashboardService.getSummaryByMonth(year, month),
   });
 }
 
+// Helper hooks that derive data from the main summary
+export function useDashboardByCategory() {
+  const query = useDashboardSummary();
+  return {
+    ...query,
+    data: query.data?.topSpendingCategories ?? [],
+  };
+}
+
 export function useDashboardBalanceEvolution() {
-  return useQuery({
-    queryKey: ["dashboard", "balance-evolution"],
-    queryFn: dashboardService.getBalanceEvolution,
-  });
+  const query = useDashboardSummary();
+  return {
+    ...query,
+    data: query.data?.balanceHistory ?? [],
+  };
+}
+
+export function useDashboardComparison() {
+  const query = useDashboardSummary();
+  return {
+    ...query,
+    data: query.data?.comparison,
+  };
 }
