@@ -2,24 +2,35 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  useDashboardSummary,
-  useDashboardByCategory,
-  useDashboardBalanceEvolution,
-} from "@/hooks/use-dashboard";
+import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useBudgetsByMonth } from "@/hooks/use-budgets";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
 import { TransactionType, TransactionTypeLabels } from "@/lib/types";
-import { PieChart, Pie, Cell, ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, Legend } from "recharts";
-import { ArrowUpIcon, ArrowDownIcon, Wallet, Loader2, TrendingUp } from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  Legend,
+} from "recharts";
+import {
+  ArrowUpIcon,
+  ArrowDownIcon,
+  Wallet,
+  Loader2,
+} from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
   const { data: summary, isLoading: summaryLoading } = useDashboardSummary();
-  const { data: categorySpending, isLoading: categoryLoading } = useDashboardByCategory();
-  const { data: balanceEvolution, isLoading: balanceLoading } = useDashboardBalanceEvolution();
-  const { data: transactions, isLoading: transactionsLoading } = useTransactions();
+  const { data: transactions, isLoading: transactionsLoading } =
+    useTransactions();
 
   const currentDate = new Date();
   const { data: budgets, isLoading: budgetsLoading } = useBudgetsByMonth(
@@ -41,6 +52,16 @@ export default function DashboardPage() {
         return "bg-gray-500";
     }
   };
+
+  // Preparar dados do gráfico de evolução de saldo
+  const balanceEvolutionData =
+    summary?.balanceHistory?.map((item) => ({
+      date: `${item.month}/${item.year}`,
+      balance: item.balance,
+    })) || [];
+
+  // Preparar dados do gráfico de categorias
+  const categorySpendingData = summary?.topSpendingCategories || [];
 
   return (
     <div className="space-y-8">
@@ -79,7 +100,7 @@ export default function DashboardPage() {
               <Skeleton className="h-8 w-32" />
             ) : (
               <div className="text-2xl font-bold text-red-500">
-                {formatCurrency(summary?.totalExpense || 0)}
+                {formatCurrency(summary?.totalExpenses || 0)}
               </div>
             )}
           </CardContent>
@@ -114,28 +135,31 @@ export default function DashboardPage() {
             <CardTitle>Gastos por Categoria</CardTitle>
           </CardHeader>
           <CardContent>
-            {categoryLoading ? (
+            {summaryLoading ? (
               <div className="flex items-center justify-center h-64">
                 <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
               </div>
-            ) : categorySpending && categorySpending.length > 0 ? (
+            ) : categorySpendingData && categorySpendingData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={categorySpending.slice(0, 5)}
+                    data={categorySpendingData.slice(0, 5)}
                     cx="50%"
                     cy="50%"
                     labelLine={false}
                     label={({ name, percent }) =>
-                      `${name}: ${(percent * 100).toFixed(0)}%`
+                      `${name}: ${((percent || 0) * 100).toFixed(0)}%`
                     }
                     outerRadius={80}
                     fill="#8884d8"
                     dataKey="amount"
                     nameKey="categoryName"
                   >
-                    {categorySpending.slice(0, 5).map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    {categorySpendingData.slice(0, 5).map((entry, index) => (
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color || COLORS[index % COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => formatCurrency(Number(value))} />
@@ -155,21 +179,18 @@ export default function DashboardPage() {
             <CardTitle>Evolução do Saldo</CardTitle>
           </CardHeader>
           <CardContent>
-            {balanceLoading ? (
+            {summaryLoading ? (
               <div className="flex items-center justify-center h-64">
                 <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
               </div>
-            ) : balanceEvolution && balanceEvolution.length > 0 ? (
+            ) : balanceEvolutionData && balanceEvolutionData.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={balanceEvolution}>
-                  <XAxis
-                    dataKey="date"
-                    tickFormatter={(value) => formatDate(value)}
-                  />
+                <LineChart data={balanceEvolutionData}>
+                  <XAxis dataKey="date" />
                   <YAxis tickFormatter={(value) => formatCurrency(value)} />
                   <Tooltip
                     formatter={(value) => formatCurrency(Number(value))}
-                    labelFormatter={(label) => formatDate(label)}
+                    labelFormatter={(label) => `Período: ${label}`}
                   />
                   <Legend />
                   <Line

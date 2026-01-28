@@ -1,9 +1,5 @@
 import api from "@/lib/api";
-import {
-  DashboardSummary,
-  CategorySpending,
-  BalanceEvolution,
-} from "@/lib/types";
+import { DashboardSummary } from "@/lib/types";
 
 export const dashboardService = {
   getSummary: async (): Promise<DashboardSummary> => {
@@ -11,16 +7,12 @@ export const dashboardService = {
     return response.data;
   },
 
-  getByCategory: async (): Promise<CategorySpending[]> => {
-    const response = await api.get<CategorySpending[]>(
-      "/dashboard/by-category"
-    );
-    return response.data;
-  },
-
-  getBalanceEvolution: async (): Promise<BalanceEvolution[]> => {
-    const response = await api.get<BalanceEvolution[]>(
-      "/dashboard/balance-evolution"
+  getSummaryByMonth: async (
+    year: number,
+    month: number
+  ): Promise<DashboardSummary> => {
+    const response = await api.get<DashboardSummary>(
+      `/dashboard/summary/${year}/${month}`
     );
     return response.data;
   },

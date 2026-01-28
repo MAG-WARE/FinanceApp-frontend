@@ -8,16 +8,9 @@ export function useDashboardSummary() {
   });
 }
 
-export function useDashboardByCategory() {
+export function useDashboardSummaryByMonth(year: number, month: number) {
   return useQuery({
-    queryKey: ["dashboard", "by-category"],
-    queryFn: dashboardService.getByCategory,
-  });
-}
-
-export function useDashboardBalanceEvolution() {
-  return useQuery({
-    queryKey: ["dashboard", "balance-evolution"],
-    queryFn: dashboardService.getBalanceEvolution,
+    queryKey: ["dashboard", "summary", year, month],
+    queryFn: () => dashboardService.getSummaryByMonth(year, month),
   });
 }
