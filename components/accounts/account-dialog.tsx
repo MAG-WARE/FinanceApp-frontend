@@ -157,13 +157,15 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
               <Input
                 id="color"
                 type="color"
-                className="h-10 w-20"
-                {...register("color")}
+                className="h-10 w-20 cursor-pointer"
+                value={watch("color") || "#6366f1"}
+                onChange={(e) => setValue("color", e.target.value)}
               />
               <Input
                 type="text"
                 placeholder="#6366f1"
-                {...register("color")}
+                value={watch("color") || ""}
+                onChange={(e) => setValue("color", e.target.value)}
               />
             </div>
           </div>

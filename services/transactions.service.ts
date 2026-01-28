@@ -8,10 +8,17 @@ import {
 
 export const transactionsService = {
   getAll: async (filters?: TransactionFilters): Promise<Transaction[]> => {
-    const response = await api.get<Transaction[]>("/transaction", {
-      params: filters,
-    });
-    return response.data;
+    console.log("🔍 [transactionsService] Fetching transactions with filters:", filters);
+    try {
+      const response = await api.get<Transaction[]>("/transaction", {
+        params: filters,
+      });
+      console.log("✅ [transactionsService] Transactions fetched:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ [transactionsService] Error fetching transactions:", error);
+      throw error;
+    }
   },
 
   getById: async (id: string): Promise<Transaction> => {

@@ -15,16 +15,34 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
 
+    console.log(`🌐 [API Request] ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`, {
+      hasToken: !!token,
+      params: config.params,
+    });
+
     return config;
   },
   (error) => {
+    console.error("❌ [API Request Error]", error);
     return Promise.reject(error);
   }
 );
 
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log(`✅ [API Response] ${response.config.method?.toUpperCase()} ${response.config.url}`, {
+      status: response.status,
+      dataLength: Array.isArray(response.data) ? response.data.length : 'N/A',
+    });
+    return response;
+  },
   (error) => {
+    console.error(`❌ [API Error] ${error.config?.method?.toUpperCase()} ${error.config?.url}`, {
+      status: error.response?.status,
+      message: error.response?.data?.message || error.message,
+      data: error.response?.data,
+    });
+
     if (error.response?.status === 401) {
       localStorage.removeItem("@financeapp:token");
       localStorage.removeItem("@financeapp:user");

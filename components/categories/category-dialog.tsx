@@ -95,8 +95,19 @@ export function CategoryDialog({ open, onOpenChange, category, defaultType }: Ca
           <div className="space-y-2">
             <Label htmlFor="color">Cor</Label>
             <div className="flex gap-2">
-              <Input id="color" type="color" className="h-10 w-20" {...register("color")} />
-              <Input type="text" placeholder="#6366f1" {...register("color")} />
+              <Input
+                id="color"
+                type="color"
+                className="h-10 w-20 cursor-pointer"
+                value={watch("color") || "#6366f1"}
+                onChange={(e) => setValue("color", e.target.value)}
+              />
+              <Input
+                type="text"
+                placeholder="#6366f1"
+                value={watch("color") || ""}
+                onChange={(e) => setValue("color", e.target.value)}
+              />
             </div>
           </div>
 

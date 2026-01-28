@@ -3,8 +3,15 @@ import { Account, CreateAccountDto, UpdateAccountDto } from "@/lib/types";
 
 export const accountsService = {
   getAll: async (): Promise<Account[]> => {
-    const response = await api.get<Account[]>("/account");
-    return response.data;
+    console.log("🔍 [accountsService] Fetching accounts...");
+    try {
+      const response = await api.get<Account[]>("/account");
+      console.log("✅ [accountsService] Accounts fetched:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("❌ [accountsService] Error fetching accounts:", error);
+      throw error;
+    }
   },
 
   getById: async (id: string): Promise<Account> => {
