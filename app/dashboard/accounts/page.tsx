@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { useAccounts, useDeleteAccount, useUpdateAccount, useToggleAccountStatus } from "@/hooks/use-accounts";
+import { useViewContext } from "@/contexts/ViewContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatCurrency } from "@/lib/utils/format";
 import { Account, AccountType, AccountTypeLabels } from "@/lib/types";
-import { Plus, CreditCard, Eye, EyeOff, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { Plus, CreditCard, Eye, EyeOff, MoreVertical, Pencil, Trash2, Lock } from "lucide-react";
 import { AccountDialog } from "@/components/accounts/account-dialog";
 import {
   DropdownMenu,
@@ -32,6 +33,7 @@ export default function AccountsPage() {
   const deleteAccountMutation = useDeleteAccount();
   const updateAccountMutation = useUpdateAccount();
   const toggleAccountStatusMutation = useToggleAccountStatus();
+  const { isViewingOwn, viewContext } = useViewContext();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -68,6 +70,34 @@ export default function AccountsPage() {
   const getAccountIcon = (type: AccountType) => {
     return <CreditCard className="h-6 w-6" />;
   };
+
+  // Show restricted message when viewing other users' data
+  if (!isViewingOwn) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Contas</h1>
+          <p className="text-muted-foreground">
+            Gerencie suas contas bancárias e carteiras
+          </p>
+        </div>
+
+        <Card>
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <Lock className="h-12 w-12 text-muted-foreground mb-4" />
+            <p className="text-lg font-medium text-muted-foreground">Acesso Restrito</p>
+            <p className="text-sm text-muted-foreground mt-2 text-center max-w-md">
+              As contas bancárias são informações privadas e não podem ser visualizadas
+              quando você está vendo dados de outros membros do grupo.
+            </p>
+            <p className="text-sm text-muted-foreground mt-4">
+              Selecione &quot;Meus dados&quot; no menu para ver suas contas.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

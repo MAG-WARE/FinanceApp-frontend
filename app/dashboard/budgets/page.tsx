@@ -2,12 +2,13 @@
 
 import { useState, useMemo } from "react";
 import { useBudgets } from "@/hooks/use-budgets";
+import { useViewContext } from "@/contexts/ViewContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { formatCurrency } from "@/lib/utils/format";
-import { Plus, PiggyBank } from "lucide-react";
+import { Plus, PiggyBank, Eye } from "lucide-react";
 import { BudgetDialog } from "@/components/budgets/budget-dialog";
 import { Budget } from "@/lib/types";
 
@@ -27,6 +28,7 @@ export default function BudgetsPage() {
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
 
   const { data: budgets, isLoading } = useBudgets();
+  const { canEdit, isViewingOwn, viewContext } = useViewContext();
 
   const months = [
     { value: 1, label: "Janeiro" },
@@ -45,6 +47,12 @@ export default function BudgetsPage() {
 
   const getMonthName = (month: number) => {
     return months.find(m => m.value === month)?.label || "";
+  };
+
+  const getViewContextLabel = () => {
+    if (isViewingOwn) return null;
+    if (viewContext.memberUserName) return `Visualizando: ${viewContext.memberUserName}`;
+    return "Visualizando: Todos os membros";
   };
 
   // Agrupar orçamentos por mês/ano e ordenar
@@ -158,10 +166,12 @@ export default function BudgetsPage() {
       <CardContent className="flex flex-col items-center justify-center py-12">
         <PiggyBank className="h-12 w-12 text-muted-foreground mb-4" />
         <p className="text-muted-foreground">{message}</p>
-        <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Criar primeiro orçamento
-        </Button>
+        {canEdit && (
+          <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Criar primeiro orçamento
+          </Button>
+        )}
       </CardContent>
     </Card>
   );
@@ -175,11 +185,22 @@ export default function BudgetsPage() {
             Acompanhe seus gastos mensais por categoria
           </p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Novo Orçamento
-        </Button>
+        {canEdit && (
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Novo Orçamento
+          </Button>
+        )}
       </div>
+
+      {!isViewingOwn && (
+        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3">
+          <Eye className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+          <span className="text-sm text-indigo-700 dark:text-indigo-300">
+            {getViewContextLabel()} - Somente visualização
+          </span>
+        </div>
+      )}
 
       {/* Filtros */}
       <div className="flex gap-4">
@@ -243,12 +264,14 @@ export default function BudgetsPage() {
         </TabsContent>
       </Tabs>
 
-      <BudgetDialog
-        open={isDialogOpen}
-        onOpenChange={setIsDialogOpen}
-        defaultMonth={currentMonth}
-        defaultYear={currentYear}
-      />
+      {canEdit && (
+        <BudgetDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          defaultMonth={currentMonth}
+          defaultYear={currentYear}
+        />
+      )}
     </div>
   );
 }

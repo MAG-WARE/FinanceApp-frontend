@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { useTransactions, useDeleteTransaction } from "@/hooks/use-transactions";
-import { useAccounts } from "@/hooks/use-accounts";
-import { useCategories } from "@/hooks/use-categories";
+import { useViewContext } from "@/contexts/ViewContext";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
 import { Transaction, TransactionType, TransactionTypeLabels } from "@/lib/types";
-import { Plus, Pencil, Trash2, Filter } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye } from "lucide-react";
 import { TransactionDialog } from "@/components/transactions/transaction-dialog";
 import {
   AlertDialog,
@@ -34,18 +33,20 @@ import {
 export default function TransactionsPage() {
   const { data: transactions, isLoading } = useTransactions();
   const deleteTransactionMutation = useDeleteTransaction();
+  const { canEdit, isViewingOwn, viewContext } = useViewContext();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);
   const [transactionToDelete, setTransactionToDelete] = useState<string | null>(null);
 
   const handleEdit = (transaction: Transaction) => {
+    if (!canEdit) return;
     setEditingTransaction(transaction);
     setIsDialogOpen(true);
   };
 
   const handleDelete = async () => {
-    if (transactionToDelete) {
+    if (transactionToDelete && canEdit) {
       await deleteTransactionMutation.mutateAsync(transactionToDelete);
       setTransactionToDelete(null);
     }
@@ -67,6 +68,12 @@ export default function TransactionsPage() {
     }
   };
 
+  const getViewContextLabel = () => {
+    if (isViewingOwn) return null;
+    if (viewContext.memberUserName) return `Visualizando: ${viewContext.memberUserName}`;
+    return "Visualizando: Todos os membros";
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -76,11 +83,22 @@ export default function TransactionsPage() {
             Visualize e gerencie todas as suas transações
           </p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Nova Transação
-        </Button>
+        {canEdit && (
+          <Button onClick={() => setIsDialogOpen(true)}>
+            <Plus className="mr-2 h-4 w-4" />
+            Nova Transação
+          </Button>
+        )}
       </div>
+
+      {!isViewingOwn && (
+        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3">
+          <Eye className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+          <span className="text-sm text-indigo-700 dark:text-indigo-300">
+            {getViewContextLabel()} - Somente visualização
+          </span>
+        </div>
+      )}
 
       <Card>
         {isLoading ? (
@@ -99,7 +117,7 @@ export default function TransactionsPage() {
                 <TableHead>Conta</TableHead>
                 <TableHead>Tipo</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
-                <TableHead className="text-right">Ações</TableHead>
+                {canEdit && <TableHead className="text-right">Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -126,24 +144,26 @@ export default function TransactionsPage() {
                     {transaction.type === TransactionType.Income ? "+" : "-"}
                     {formatCurrency(transaction.amount)}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex justify-end gap-2">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => handleEdit(transaction)}
-                      >
-                        <Pencil className="h-4 w-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setTransactionToDelete(transaction.id)}
-                      >
-                        <Trash2 className="h-4 w-4 text-red-500" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                  {canEdit && (
+                    <TableCell className="text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => handleEdit(transaction)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => setTransactionToDelete(transaction.id)}
+                        >
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
+                      </div>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -151,19 +171,23 @@ export default function TransactionsPage() {
         ) : (
           <div className="p-12 text-center">
             <p className="text-muted-foreground">Nenhuma transação encontrada</p>
-            <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
-              <Plus className="mr-2 h-4 w-4" />
-              Criar primeira transação
-            </Button>
+            {canEdit && (
+              <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
+                <Plus className="mr-2 h-4 w-4" />
+                Criar primeira transação
+              </Button>
+            )}
           </div>
         )}
       </Card>
 
-      <TransactionDialog
-        open={isDialogOpen}
-        onOpenChange={handleCloseDialog}
-        transaction={editingTransaction}
-      />
+      {canEdit && (
+        <TransactionDialog
+          open={isDialogOpen}
+          onOpenChange={handleCloseDialog}
+          transaction={editingTransaction}
+        />
+      )}
 
       <AlertDialog open={!!transactionToDelete} onOpenChange={() => setTransactionToDelete(null)}>
         <AlertDialogContent>
