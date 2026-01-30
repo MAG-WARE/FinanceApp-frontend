@@ -1,9 +1,14 @@
 import api from "@/lib/api";
-import { Budget, CreateBudgetDto, UpdateBudgetDto } from "@/lib/types";
+import { Budget, CreateBudgetDto, UpdateBudgetDto, ViewContextType } from "@/lib/types";
+
+interface BudgetQueryParams {
+  context?: ViewContextType;
+  memberUserId?: string;
+}
 
 export const budgetsService = {
-  getAll: async (): Promise<Budget[]> => {
-    const response = await api.get<Budget[]>("/budget");
+  getAll: async (params?: BudgetQueryParams): Promise<Budget[]> => {
+    const response = await api.get<Budget[]>("/budget", { params });
     return response.data;
   },
 
@@ -12,8 +17,8 @@ export const budgetsService = {
     return response.data;
   },
 
-  getByMonth: async (year: number, month: number): Promise<Budget[]> => {
-    const response = await api.get<Budget[]>(`/budget/month/${year}/${month}`);
+  getByMonth: async (year: number, month: number, params?: BudgetQueryParams): Promise<Budget[]> => {
+    const response = await api.get<Budget[]>(`/budget/month/${year}/${month}`, { params });
     return response.data;
   },
 

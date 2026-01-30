@@ -1,13 +1,18 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { transactionsService } from "@/services/transactions.service";
-import { TransactionFilters } from "@/lib/types";
+import { TransactionFilters, ViewContextType } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { formatApiError, getErrorDescription } from "@/lib/error-handler";
 
-export function useTransactions(filters?: TransactionFilters) {
+interface TransactionQueryParams extends TransactionFilters {
+  context?: ViewContextType;
+  memberUserId?: string;
+}
+
+export function useTransactions(params?: TransactionQueryParams) {
   return useQuery({
-    queryKey: ["transactions", filters],
-    queryFn: () => transactionsService.getAll(filters),
+    queryKey: ["transactions", params],
+    queryFn: () => transactionsService.getAll(params),
   });
 }
 

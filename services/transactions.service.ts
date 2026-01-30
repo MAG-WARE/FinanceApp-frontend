@@ -4,12 +4,18 @@ import {
   CreateTransactionDto,
   UpdateTransactionDto,
   TransactionFilters,
+  ViewContextType,
 } from "@/lib/types";
 
+interface TransactionQueryParams extends TransactionFilters {
+  context?: ViewContextType;
+  memberUserId?: string;
+}
+
 export const transactionsService = {
-  getAll: async (filters?: TransactionFilters): Promise<Transaction[]> => {
+  getAll: async (params?: TransactionQueryParams): Promise<Transaction[]> => {
     const response = await api.get<Transaction[]>("/transaction", {
-      params: filters,
+      params,
     });
     return response.data;
   },

@@ -1,19 +1,25 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { budgetsService } from "@/services/budgets.service";
+import { ViewContextType } from "@/lib/types";
 import { toast } from "@/hooks/use-toast";
 import { formatApiError, getErrorDescription } from "@/lib/error-handler";
 
-export function useBudgets() {
+interface BudgetQueryParams {
+  context?: ViewContextType;
+  memberUserId?: string;
+}
+
+export function useBudgets(params?: BudgetQueryParams) {
   return useQuery({
-    queryKey: ["budgets"],
-    queryFn: () => budgetsService.getAll(),
+    queryKey: ["budgets", params],
+    queryFn: () => budgetsService.getAll(params),
   });
 }
 
-export function useBudgetsByMonth(year: number, month: number) {
+export function useBudgetsByMonth(year: number, month: number, params?: BudgetQueryParams) {
   return useQuery({
-    queryKey: ["budgets", "month", year, month],
-    queryFn: () => budgetsService.getByMonth(year, month),
+    queryKey: ["budgets", "month", year, month, params],
+    queryFn: () => budgetsService.getByMonth(year, month, params),
   });
 }
 

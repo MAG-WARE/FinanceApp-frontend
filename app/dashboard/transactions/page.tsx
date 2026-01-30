@@ -31,9 +31,11 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function TransactionsPage() {
-  const { data: transactions, isLoading } = useTransactions();
+  const { canEdit, isViewingOwn, viewContext, getQueryParams } = useViewContext();
+  const queryParams = getQueryParams();
+
+  const { data: transactions, isLoading } = useTransactions(queryParams);
   const deleteTransactionMutation = useDeleteTransaction();
-  const { canEdit, isViewingOwn, viewContext } = useViewContext();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingTransaction, setEditingTransaction] = useState<Transaction | null>(null);

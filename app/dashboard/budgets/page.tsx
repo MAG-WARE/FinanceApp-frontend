@@ -27,8 +27,10 @@ export default function BudgetsPage() {
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
 
-  const { data: budgets, isLoading } = useBudgets();
-  const { canEdit, isViewingOwn, viewContext } = useViewContext();
+  const { canEdit, isViewingOwn, viewContext, getQueryParams } = useViewContext();
+  const queryParams = getQueryParams();
+
+  const { data: budgets, isLoading } = useBudgets(queryParams);
 
   const months = [
     { value: 1, label: "Janeiro" },

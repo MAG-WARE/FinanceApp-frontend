@@ -35,12 +35,13 @@ export default function DashboardPage() {
 
   const { data: summary, isLoading: summaryLoading } = useDashboardSummary(queryParams);
   const { data: transactions, isLoading: transactionsLoading } =
-    useTransactions();
+    useTransactions(queryParams);
 
   const currentDate = new Date();
   const { data: budgets, isLoading: budgetsLoading } = useBudgetsByMonth(
     currentDate.getFullYear(),
-    currentDate.getMonth() + 1
+    currentDate.getMonth() + 1,
+    queryParams
   );
 
   const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"];
