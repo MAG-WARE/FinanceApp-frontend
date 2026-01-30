@@ -74,7 +74,13 @@ export default function DashboardPage() {
     })) || [];
 
   // Preparar dados do gráfico de categorias
-  const categorySpendingData = summary?.topSpendingCategories || [];
+  // Quando em modo "All", incluir nome do usuário na label
+  const categorySpendingData = (summary?.topSpendingCategories || []).map((item) => ({
+    ...item,
+    displayName: isViewingAll && item.userName
+      ? `${item.categoryName} (${item.userName})`
+      : item.categoryName,
+  }));
 
   const getViewContextLabel = () => {
     if (isViewingOwn) return null;
@@ -175,13 +181,13 @@ export default function DashboardPage() {
                     cx="50%"
                     cy="50%"
                     labelLine={false}
-                    label={({ name, percent }) =>
-                      `${name}: ${((percent || 0) * 100).toFixed(0)}%`
+                    label={({ displayName, percent }) =>
+                      `${displayName}: ${((percent || 0) * 100).toFixed(0)}%`
                     }
                     outerRadius={70}
                     fill="#8884d8"
                     dataKey="amount"
-                    nameKey="categoryName"
+                    nameKey="displayName"
                   >
                     {categorySpendingData.slice(0, 5).map((entry, index) => (
                       <Cell
@@ -265,20 +271,15 @@ export default function DashboardPage() {
                     className="flex items-center justify-between p-3 border rounded-lg"
                   >
                     <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{transaction.description}</p>
-                        {isViewingAll && transaction.userName && (
-                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                            {transaction.userName}
-                          </span>
-                        )}
-                      </div>
+                      <p className="font-medium">{transaction.description}</p>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge className={getTransactionBadgeColor(transaction.type)}>
                           {TransactionTypeLabels[transaction.type]}
                         </Badge>
                         <span className="text-sm text-muted-foreground">
-                          {transaction.categoryName}
+                          {isViewingAll && transaction.userName
+                            ? `${transaction.categoryName} (${transaction.userName})`
+                            : transaction.categoryName}
                         </span>
                       </div>
                     </div>
@@ -329,14 +330,11 @@ export default function DashboardPage() {
                   return (
                     <div key={budget.id} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{budget.categoryName}</span>
-                          {isViewingAll && budget.userName && (
-                            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
-                              {budget.userName}
-                            </span>
-                          )}
-                        </div>
+                        <span className="font-medium">
+                          {isViewingAll && budget.userName
+                            ? `${budget.categoryName} (${budget.userName})`
+                            : budget.categoryName}
+                        </span>
                         <span
                           className={`text-sm font-medium ${
                             isOverBudget ? "text-red-500" : "text-muted-foreground"

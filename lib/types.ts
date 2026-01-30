@@ -205,6 +205,9 @@ export interface CategorySpending {
   amount: number;
   percentage: number;
   color?: string;
+  // User identification (for group views)
+  userId?: string;
+  userName?: string;
 }
 
 export interface MonthlyBalance {

@@ -122,14 +122,11 @@ export default function BudgetsPage() {
     return (
       <Card key={budget.id}>
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-lg">{budget.categoryName}</CardTitle>
-            {isViewingAll && budget.userName && (
-              <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
-                {budget.userName}
-              </span>
-            )}
-          </div>
+          <CardTitle className="text-lg">
+            {isViewingAll && budget.userName
+              ? `${budget.categoryName} (${budget.userName})`
+              : budget.categoryName}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
