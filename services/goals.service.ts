@@ -1,14 +1,24 @@
 import api from "@/lib/api";
-import { Goal, CreateGoalDto, UpdateGoalDto } from "@/lib/types";
+import { Goal, CreateGoalDto, UpdateGoalDto, ViewContextType } from "@/lib/types";
+
+interface GoalQueryParams {
+  context?: ViewContextType;
+  memberUserId?: string;
+}
 
 export const goalsService = {
-  getAll: async (): Promise<Goal[]> => {
-    const response = await api.get<Goal[]>("/goal");
+  getAll: async (params?: GoalQueryParams): Promise<Goal[]> => {
+    const response = await api.get<Goal[]>("/goal", { params });
     return response.data;
   },
 
   getById: async (id: string): Promise<Goal> => {
     const response = await api.get<Goal>(`/goal/${id}`);
+    return response.data;
+  },
+
+  getShared: async (): Promise<Goal[]> => {
+    const response = await api.get<Goal[]>("/goal/shared");
     return response.data;
   },
 

@@ -80,6 +80,12 @@ export interface Goal {
   isCompleted: boolean;
   color?: string;
   icon?: string;
+  // Shared goal fields
+  ownerId?: string;
+  ownerName?: string;
+  isOwner?: boolean;
+  isShared?: boolean;
+  sharedWith?: GoalUser[];
 }
 
 export interface CreateAccountDto {
@@ -238,6 +244,76 @@ export interface TransactionFilters {
   type?: TransactionType;
 }
 
+// User Groups & Shared Goals
+export enum GroupMemberRole {
+  Owner = 1,
+  Member = 2,
+}
+
+export enum ViewContextType {
+  Own = 1,
+  Member = 2,
+  All = 3,
+}
+
+export interface GroupMember {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  role: GroupMemberRole;
+  joinedAt: string;
+}
+
+export interface UserGroup {
+  id: string;
+  name: string;
+  description?: string;
+  inviteCode: string;
+  createdByUserId: string;
+  createdByUserName: string;
+  createdAt: string;
+  memberCount: number;
+  members: GroupMember[];
+}
+
+export interface GoalUser {
+  userId: string;
+  userName: string;
+  isOwner: boolean;
+  addedAt: string;
+}
+
+export interface CreateUserGroupDto {
+  name: string;
+  description?: string;
+}
+
+export interface UpdateUserGroupDto {
+  name?: string;
+  description?: string;
+}
+
+export interface JoinGroupDto {
+  inviteCode: string;
+}
+
+export interface ShareGoalDto {
+  goalId: string;
+  userIds: string[];
+}
+
+export interface UnshareGoalDto {
+  goalId: string;
+  userId: string;
+}
+
+export interface ViewContextState {
+  type: ViewContextType;
+  memberUserId?: string;
+  memberUserName?: string;
+}
+
 export const AccountTypeLabels: Record<AccountType, string> = {
   [AccountType.CheckingAccount]: "Conta Corrente",
   [AccountType.SavingsAccount]: "Conta Poupança",
@@ -255,4 +331,15 @@ export const TransactionTypeLabels: Record<TransactionType, string> = {
 export const CategoryTypeLabels: Record<CategoryType, string> = {
   [CategoryType.Income]: "Receita",
   [CategoryType.Expense]: "Despesa",
+};
+
+export const GroupMemberRoleLabels: Record<GroupMemberRole, string> = {
+  [GroupMemberRole.Owner]: "Proprietário",
+  [GroupMemberRole.Member]: "Membro",
+};
+
+export const ViewContextTypeLabels: Record<ViewContextType, string> = {
+  [ViewContextType.Own]: "Meus dados",
+  [ViewContextType.Member]: "Membro",
+  [ViewContextType.All]: "Todos",
 };

@@ -2,11 +2,17 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { goalsService } from "@/services/goals.service";
 import { toast } from "@/hooks/use-toast";
 import { formatApiError, getErrorDescription } from "@/lib/error-handler";
+import { ViewContextType } from "@/lib/types";
 
-export function useGoals() {
+interface GoalQueryParams {
+  context?: ViewContextType;
+  memberUserId?: string;
+}
+
+export function useGoals(params?: GoalQueryParams) {
   return useQuery({
-    queryKey: ["goals"],
-    queryFn: goalsService.getAll,
+    queryKey: ["goals", params],
+    queryFn: () => goalsService.getAll(params),
   });
 }
 

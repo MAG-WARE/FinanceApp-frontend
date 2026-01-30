@@ -15,9 +15,11 @@ import {
   Wallet,
   Menu,
   X,
+  Users,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { ViewContextSwitcher } from "@/components/groups/view-context-switcher";
 import { useState } from "react";
 
 const menuItems = [
@@ -50,6 +52,11 @@ const menuItems = [
     label: "Metas",
     icon: Target,
     href: "/dashboard/goals",
+  },
+  {
+    label: "Grupos",
+    icon: Users,
+    href: "/dashboard/groups",
   },
 ];
 
@@ -104,6 +111,10 @@ export function Sidebar() {
           );
         })}
       </nav>
+
+      <div className="px-4 pb-4">
+        <ViewContextSwitcher />
+      </div>
 
       <div className="p-4 border-t">
         <div className="flex items-center gap-3 px-4 py-3 mb-2">

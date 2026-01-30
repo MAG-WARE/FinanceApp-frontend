@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { useDashboardSummary } from "@/hooks/use-dashboard";
 import { useTransactions } from "@/hooks/use-transactions";
 import { useBudgetsByMonth } from "@/hooks/use-budgets";
+import { useViewContext } from "@/contexts/ViewContext";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
 import { TransactionType, TransactionTypeLabels } from "@/lib/types";
 import {
@@ -24,11 +25,15 @@ import {
   ArrowDownIcon,
   Wallet,
   Loader2,
+  Eye,
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
-  const { data: summary, isLoading: summaryLoading } = useDashboardSummary();
+  const { getQueryParams, isViewingOwn, viewContext } = useViewContext();
+  const queryParams = getQueryParams();
+
+  const { data: summary, isLoading: summaryLoading } = useDashboardSummary(queryParams);
   const { data: transactions, isLoading: transactionsLoading } =
     useTransactions();
 
@@ -63,6 +68,12 @@ export default function DashboardPage() {
   // Preparar dados do gráfico de categorias
   const categorySpendingData = summary?.topSpendingCategories || [];
 
+  const getViewContextLabel = () => {
+    if (isViewingOwn) return null;
+    if (viewContext.memberUserName) return `Visualizando: ${viewContext.memberUserName}`;
+    return "Visualizando: Todos os membros";
+  };
+
   return (
     <div className="space-y-8">
       <div>
@@ -71,6 +82,15 @@ export default function DashboardPage() {
           Visão geral das suas finanças
         </p>
       </div>
+
+      {!isViewingOwn && (
+        <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3">
+          <Eye className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
+          <span className="text-sm text-indigo-700 dark:text-indigo-300">
+            {getViewContextLabel()}
+          </span>
+        </div>
+      )}
 
       {/* Cards de Resumo */}
       <div className="grid gap-4 md:grid-cols-3">
