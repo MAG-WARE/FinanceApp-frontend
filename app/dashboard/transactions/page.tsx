@@ -31,7 +31,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function TransactionsPage() {
-  const { canEdit, isViewingOwn, viewContext, getQueryParams } = useViewContext();
+  const { canEdit, canAddOwn, isViewingOwn, isViewingAll, viewContext, getQueryParams } = useViewContext();
   const queryParams = getQueryParams();
 
   const { data: transactions, isLoading } = useTransactions(queryParams);
@@ -85,7 +85,7 @@ export default function TransactionsPage() {
             Visualize e gerencie todas as suas transações
           </p>
         </div>
-        {canEdit && (
+        {canAddOwn && (
           <Button onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Nova Transação
@@ -97,7 +97,7 @@ export default function TransactionsPage() {
         <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3">
           <Eye className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
           <span className="text-sm text-indigo-700 dark:text-indigo-300">
-            {getViewContextLabel()} - Somente visualização
+            {getViewContextLabel()}{!isViewingAll && " - Somente visualização"}
           </span>
         </div>
       )}
@@ -117,6 +117,7 @@ export default function TransactionsPage() {
                 <TableHead>Descrição</TableHead>
                 <TableHead>Categoria</TableHead>
                 <TableHead>Conta</TableHead>
+                {isViewingAll && <TableHead>Usuário</TableHead>}
                 <TableHead>Tipo</TableHead>
                 <TableHead className="text-right">Valor</TableHead>
                 {canEdit && <TableHead className="text-right">Ações</TableHead>}
@@ -131,6 +132,13 @@ export default function TransactionsPage() {
                   </TableCell>
                   <TableCell>{transaction.categoryName}</TableCell>
                   <TableCell>{transaction.accountName}</TableCell>
+                  {isViewingAll && (
+                    <TableCell>
+                      <span className="text-sm text-muted-foreground">
+                        {transaction.userName || "-"}
+                      </span>
+                    </TableCell>
+                  )}
                   <TableCell>
                     <Badge className={getTransactionBadgeColor(transaction.type)}>
                       {TransactionTypeLabels[transaction.type]}
@@ -173,7 +181,7 @@ export default function TransactionsPage() {
         ) : (
           <div className="p-12 text-center">
             <p className="text-muted-foreground">Nenhuma transação encontrada</p>
-            {canEdit && (
+            {canAddOwn && (
               <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
                 <Plus className="mr-2 h-4 w-4" />
                 Criar primeira transação
@@ -183,7 +191,7 @@ export default function TransactionsPage() {
         )}
       </Card>
 
-      {canEdit && (
+      {canAddOwn && (
         <TransactionDialog
           open={isDialogOpen}
           onOpenChange={handleCloseDialog}

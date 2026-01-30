@@ -12,6 +12,7 @@ interface ViewContextData {
   isViewingMember: boolean;
   isViewingAll: boolean;
   canEdit: boolean;
+  canAddOwn: boolean; // Can add own data (true for Own and All views)
   getQueryParams: () => { context?: number; memberUserId?: string };
 }
 
@@ -64,6 +65,9 @@ export function ViewContextProvider({ children }: { children: ReactNode }) {
   // Can only edit when viewing own data
   const canEdit = isViewingOwn;
 
+  // Can add own data when viewing Own or All
+  const canAddOwn = isViewingOwn || isViewingAll;
+
   const getQueryParams = useCallback(() => {
     if (viewContext.type === ViewContextType.Own) {
       return {};
@@ -88,6 +92,7 @@ export function ViewContextProvider({ children }: { children: ReactNode }) {
         isViewingMember,
         isViewingAll,
         canEdit,
+        canAddOwn,
         getQueryParams,
       }}
     >

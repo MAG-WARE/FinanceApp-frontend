@@ -30,7 +30,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function DashboardPage() {
-  const { getQueryParams, isViewingOwn, viewContext } = useViewContext();
+  const { getQueryParams, isViewingOwn, isViewingAll, viewContext } = useViewContext();
   const queryParams = getQueryParams();
 
   const { data: summary, isLoading: summaryLoading } = useDashboardSummary(queryParams);
@@ -45,6 +45,13 @@ export default function DashboardPage() {
   );
 
   const COLORS = ["#6366f1", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"];
+
+  const monthShortNames = [
+    "jan", "fev", "mar", "abr", "mai", "jun",
+    "jul", "ago", "set", "out", "nov", "dez"
+  ];
+
+  const getMonthShortName = (month: number) => monthShortNames[month - 1] || "";
 
   const getTransactionBadgeColor = (type: TransactionType) => {
     switch (type) {
@@ -62,7 +69,7 @@ export default function DashboardPage() {
   // Preparar dados do gráfico de evolução de saldo
   const balanceEvolutionData =
     summary?.balanceHistory?.map((item) => ({
-      date: `${item.month}/${item.year}`,
+      date: `${getMonthShortName(item.month)}/${item.year}`,
       balance: item.balance,
     })) || [];
 
@@ -149,9 +156,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Gráficos */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* Gastos por Categoria */}
-        <Card>
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-5">
+        {/* Gastos por Categoria - menor */}
+        <Card className="md:col-span-2">
           <CardHeader>
             <CardTitle>Gastos por Categoria</CardTitle>
           </CardHeader>
@@ -161,7 +168,7 @@ export default function DashboardPage() {
                 <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
               </div>
             ) : categorySpendingData && categorySpendingData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie
                     data={categorySpendingData.slice(0, 5)}
@@ -171,7 +178,7 @@ export default function DashboardPage() {
                     label={({ name, percent }) =>
                       `${name}: ${((percent || 0) * 100).toFixed(0)}%`
                     }
-                    outerRadius={80}
+                    outerRadius={70}
                     fill="#8884d8"
                     dataKey="amount"
                     nameKey="categoryName"
@@ -194,8 +201,8 @@ export default function DashboardPage() {
           </CardContent>
         </Card>
 
-        {/* Evolução do Saldo */}
-        <Card>
+        {/* Evolução do Saldo - maior */}
+        <Card className="md:col-span-3">
           <CardHeader>
             <CardTitle>Evolução do Saldo</CardTitle>
           </CardHeader>
@@ -205,10 +212,14 @@ export default function DashboardPage() {
                 <Loader2 className="h-8 w-8 animate-spin text-indigo-500" />
               </div>
             ) : balanceEvolutionData && balanceEvolutionData.length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={balanceEvolutionData}>
-                  <XAxis dataKey="date" />
-                  <YAxis tickFormatter={(value) => formatCurrency(value)} />
+              <ResponsiveContainer width="100%" height={250}>
+                <LineChart data={balanceEvolutionData} margin={{ left: 10, right: 20 }}>
+                  <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+                  <YAxis
+                    tickFormatter={(value) => formatCurrency(value)}
+                    tick={{ fontSize: 11 }}
+                    width={80}
+                  />
                   <Tooltip
                     formatter={(value) => formatCurrency(Number(value))}
                     labelFormatter={(label) => `Período: ${label}`}
@@ -254,7 +265,14 @@ export default function DashboardPage() {
                     className="flex items-center justify-between p-3 border rounded-lg"
                   >
                     <div className="flex-1">
-                      <p className="font-medium">{transaction.description}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{transaction.description}</p>
+                        {isViewingAll && transaction.userName && (
+                          <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                            {transaction.userName}
+                          </span>
+                        )}
+                      </div>
                       <div className="flex items-center gap-2 mt-1">
                         <Badge className={getTransactionBadgeColor(transaction.type)}>
                           {TransactionTypeLabels[transaction.type]}
@@ -311,7 +329,14 @@ export default function DashboardPage() {
                   return (
                     <div key={budget.id} className="space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="font-medium">{budget.categoryName}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="font-medium">{budget.categoryName}</span>
+                          {isViewingAll && budget.userName && (
+                            <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded">
+                              {budget.userName}
+                            </span>
+                          )}
+                        </div>
                         <span
                           className={`text-sm font-medium ${
                             isOverBudget ? "text-red-500" : "text-muted-foreground"

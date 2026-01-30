@@ -27,7 +27,7 @@ export default function BudgetsPage() {
   const [selectedYear, setSelectedYear] = useState<string>("all");
   const [selectedMonth, setSelectedMonth] = useState<string>("all");
 
-  const { canEdit, isViewingOwn, viewContext, getQueryParams } = useViewContext();
+  const { canEdit, canAddOwn, isViewingOwn, isViewingAll, viewContext, getQueryParams } = useViewContext();
   const queryParams = getQueryParams();
 
   const { data: budgets, isLoading } = useBudgets(queryParams);
@@ -122,7 +122,14 @@ export default function BudgetsPage() {
     return (
       <Card key={budget.id}>
         <CardHeader>
-          <CardTitle className="text-lg">{budget.categoryName}</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-lg">{budget.categoryName}</CardTitle>
+            {isViewingAll && budget.userName && (
+              <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded">
+                {budget.userName}
+              </span>
+            )}
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
@@ -168,7 +175,7 @@ export default function BudgetsPage() {
       <CardContent className="flex flex-col items-center justify-center py-12">
         <PiggyBank className="h-12 w-12 text-muted-foreground mb-4" />
         <p className="text-muted-foreground">{message}</p>
-        {canEdit && (
+        {canAddOwn && (
           <Button className="mt-4" onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Criar primeiro orçamento
@@ -187,7 +194,7 @@ export default function BudgetsPage() {
             Acompanhe seus gastos mensais por categoria
           </p>
         </div>
-        {canEdit && (
+        {canAddOwn && (
           <Button onClick={() => setIsDialogOpen(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Novo Orçamento
@@ -199,7 +206,7 @@ export default function BudgetsPage() {
         <div className="flex items-center gap-2 bg-indigo-50 dark:bg-indigo-950 border border-indigo-200 dark:border-indigo-800 rounded-lg p-3">
           <Eye className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
           <span className="text-sm text-indigo-700 dark:text-indigo-300">
-            {getViewContextLabel()} - Somente visualização
+            {getViewContextLabel()}{!isViewingAll && " - Somente visualização"}
           </span>
         </div>
       )}
@@ -266,7 +273,7 @@ export default function BudgetsPage() {
         </TabsContent>
       </Tabs>
 
-      {canEdit && (
+      {canAddOwn && (
         <BudgetDialog
           open={isDialogOpen}
           onOpenChange={setIsDialogOpen}

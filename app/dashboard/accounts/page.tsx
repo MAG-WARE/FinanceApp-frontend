@@ -33,7 +33,7 @@ export default function AccountsPage() {
   const deleteAccountMutation = useDeleteAccount();
   const updateAccountMutation = useUpdateAccount();
   const toggleAccountStatusMutation = useToggleAccountStatus();
-  const { isViewingOwn, viewContext } = useViewContext();
+  const { isViewingOwn, isViewingAll, canAddOwn, viewContext } = useViewContext();
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [editingAccount, setEditingAccount] = useState<Account | null>(null);
@@ -71,8 +71,9 @@ export default function AccountsPage() {
     return <CreditCard className="h-6 w-6" />;
   };
 
-  // Show restricted message when viewing other users' data
-  if (!isViewingOwn) {
+  // Show restricted message when viewing other users' data (single member view)
+  // When viewing "All", show the normal page so user can manage their own accounts
+  if (!isViewingOwn && !isViewingAll) {
     return (
       <div className="space-y-6">
         <div>

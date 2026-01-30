@@ -57,6 +57,9 @@ export interface Transaction {
   notes?: string;
   destinationAccountId?: string;
   destinationAccountName?: string;
+  // User identification (for group views)
+  userId?: string;
+  userName?: string;
 }
 
 export interface Budget {
@@ -67,6 +70,9 @@ export interface Budget {
   year: number;
   limitAmount: number;
   spentAmount: number;
+  // User identification (for group views)
+  userId?: string;
+  userName?: string;
 }
 
 export interface Goal {
