@@ -9,8 +9,9 @@ export const transactionSchema = z.object({
   description: z.string().min(3, "Descrição deve ter no mínimo 3 caracteres"),
   type: z.nativeEnum(TransactionType),
   notes: z.string().optional(),
-  isRecurring: z.boolean().default(false),
+  isRecurring: z.boolean().optional(),
   destinationAccountId: z.string().optional(),
+  goalId: z.string().optional(),
 }).refine((data) => {
   // Para transferências, a conta de destino é obrigatória
   if (data.type === TransactionType.Transfer && !data.destinationAccountId) {
@@ -29,6 +30,15 @@ export const transactionSchema = z.object({
 }, {
   message: "A conta de destino deve ser diferente da conta de origem",
   path: ["destinationAccountId"],
+}).refine((data) => {
+  // Para transações de meta, o goalId é obrigatório
+  if ((data.type === TransactionType.GoalDeposit || data.type === TransactionType.GoalWithdraw) && !data.goalId) {
+    return false;
+  }
+  return true;
+}, {
+  message: "Selecione uma meta",
+  path: ["goalId"],
 });
 
 export type TransactionFormData = z.infer<typeof transactionSchema>;

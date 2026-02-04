@@ -10,6 +10,8 @@ export enum TransactionType {
   Income = 1,
   Expense = 2,
   Transfer = 3,
+  GoalDeposit = 4,
+  GoalWithdraw = 5,
 }
 
 export enum CategoryType {
@@ -57,6 +59,9 @@ export interface Transaction {
   notes?: string;
   destinationAccountId?: string;
   destinationAccountName?: string;
+  // Goal transaction fields
+  goalId?: string;
+  goalName?: string;
   // User identification (for group views)
   userId?: string;
   userName?: string;
@@ -135,6 +140,7 @@ export interface CreateTransactionDto {
   isRecurring?: boolean;
   notes?: string;
   destinationAccountId?: string;
+  goalId?: string;
 }
 
 export interface UpdateTransactionDto {
@@ -147,6 +153,7 @@ export interface UpdateTransactionDto {
   isRecurring?: boolean;
   notes?: string;
   destinationAccountId?: string;
+  goalId?: string;
 }
 
 export interface CreateBudgetDto {
@@ -317,6 +324,16 @@ export interface UnshareGoalDto {
   userId: string;
 }
 
+export interface GoalForTransactionDto {
+  id: string;
+  name: string;
+  currentAmount: number;
+  targetAmount: number;
+  isOwner: boolean;
+  color?: string;
+  icon?: string;
+}
+
 export interface ViewContextState {
   type: ViewContextType;
   memberUserId?: string;
@@ -335,6 +352,8 @@ export const TransactionTypeLabels: Record<TransactionType, string> = {
   [TransactionType.Income]: "Receita",
   [TransactionType.Expense]: "Despesa",
   [TransactionType.Transfer]: "Transferência",
+  [TransactionType.GoalDeposit]: "Depósito em Meta",
+  [TransactionType.GoalWithdraw]: "Retirada de Meta",
 };
 
 export const CategoryTypeLabels: Record<CategoryType, string> = {
