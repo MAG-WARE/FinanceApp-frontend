@@ -1,5 +1,5 @@
 import api from "@/lib/api";
-import { Goal, CreateGoalDto, UpdateGoalDto, ViewContextType } from "@/lib/types";
+import { Goal, CreateGoalDto, UpdateGoalDto, ViewContextType, GoalForTransactionDto } from "@/lib/types";
 
 interface GoalQueryParams {
   context?: ViewContextType;
@@ -19,6 +19,11 @@ export const goalsService = {
 
   getShared: async (): Promise<Goal[]> => {
     const response = await api.get<Goal[]>("/goal/shared");
+    return response.data;
+  },
+
+  getForTransaction: async (): Promise<GoalForTransactionDto[]> => {
+    const response = await api.get<GoalForTransactionDto[]>("/goal/for-transaction");
     return response.data;
   },
 

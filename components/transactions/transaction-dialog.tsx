@@ -1,20 +1,22 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { transactionSchema, TransactionFormData } from "@/lib/validations/transaction";
 import { useCreateTransaction, useUpdateTransaction } from "@/hooks/use-transactions";
 import { useAccounts } from "@/hooks/use-accounts";
 import { useCategories } from "@/hooks/use-categories";
-import { Transaction, TransactionType, TransactionTypeLabels, CategoryType } from "@/lib/types";
+import { useGoalsForTransaction } from "@/hooks/use-goals";
+import { Transaction, TransactionType, TransactionTypeLabels, CategoryType, GoalForTransactionDto } from "@/lib/types";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Target, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
+import { formatCurrency } from "@/lib/utils/format";
 
 interface TransactionDialogProps {
   open: boolean;
@@ -27,6 +29,7 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
   const updateMutation = useUpdateTransaction();
   const { data: accounts } = useAccounts();
   const { data: categories } = useCategories();
+  const { data: goalsForTransaction } = useGoalsForTransaction();
   const isEditing = !!transaction;
 
   const { register, handleSubmit, formState: { errors }, reset, setValue, watch } = useForm<TransactionFormData>({
@@ -40,9 +43,31 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
 
   const transactionType = watch("type");
   const selectedAccountId = watch("accountId");
-  const selectedCategoryType = transactionType === TransactionType.Income ? CategoryType.Income : CategoryType.Expense;
+  const selectedGoalId = watch("goalId");
+  const amount = watch("amount");
+
+  // Determine category type based on transaction type
+  const selectedCategoryType = useMemo(() => {
+    if (transactionType === TransactionType.Income || transactionType === TransactionType.GoalWithdraw) {
+      return CategoryType.Income;
+    }
+    return CategoryType.Expense;
+  }, [transactionType]);
+
   const filteredCategories = categories?.filter(c => c.type === selectedCategoryType);
   const isTransfer = transactionType === TransactionType.Transfer;
+  const isGoalTransaction = transactionType === TransactionType.GoalDeposit || transactionType === TransactionType.GoalWithdraw;
+  const isGoalDeposit = transactionType === TransactionType.GoalDeposit;
+  const isGoalWithdraw = transactionType === TransactionType.GoalWithdraw;
+
+  // Get selected goal for balance validation
+  const selectedGoal = useMemo(() => {
+    if (!selectedGoalId || !goalsForTransaction) return null;
+    return goalsForTransaction.find(g => g.id === selectedGoalId);
+  }, [selectedGoalId, goalsForTransaction]);
+
+  // Check if withdrawal amount exceeds goal balance
+  const isWithdrawExceedsBalance = isGoalWithdraw && selectedGoal && amount > selectedGoal.currentAmount;
 
   useEffect(() => {
     if (transaction) {
@@ -57,6 +82,9 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
       if (transaction.destinationAccountId) {
         setValue("destinationAccountId", transaction.destinationAccountId);
       }
+      if (transaction.goalId) {
+        setValue("goalId", transaction.goalId);
+      }
     } else {
       reset({
         type: TransactionType.Expense,
@@ -65,6 +93,16 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
       });
     }
   }, [transaction, setValue, reset]);
+
+  // Reset goalId when changing from goal transaction type to another type
+  useEffect(() => {
+    if (!isGoalTransaction) {
+      setValue("goalId", undefined);
+    }
+    if (!isTransfer) {
+      setValue("destinationAccountId", undefined);
+    }
+  }, [transactionType, isGoalTransaction, isTransfer, setValue]);
 
   const onSubmit = async (data: TransactionFormData) => {
     try {
@@ -124,7 +162,9 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="accountId">Conta {isTransfer && "de Origem"}</Label>
+              <Label htmlFor="accountId">
+                {isTransfer ? "Conta de Origem" : isGoalDeposit ? "Conta de Origem" : isGoalWithdraw ? "Conta de Destino" : "Conta"}
+              </Label>
               <Select
                 value={watch("accountId")}
                 onValueChange={(value) => setValue("accountId", value)}
@@ -180,6 +220,50 @@ export function TransactionDialog({ open, onOpenChange, transaction }: Transacti
                 </SelectContent>
               </Select>
               {errors.destinationAccountId && <p className="text-sm text-red-500">{errors.destinationAccountId.message}</p>}
+            </div>
+          )}
+
+          {isGoalTransaction && (
+            <div className="space-y-2">
+              <Label htmlFor="goalId" className="flex items-center gap-2">
+                <Target className="h-4 w-4" />
+                {isGoalDeposit ? "Meta de Destino" : "Meta de Origem"}
+              </Label>
+              <Select
+                value={watch("goalId")}
+                onValueChange={(value) => setValue("goalId", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Selecione uma meta" />
+                </SelectTrigger>
+                <SelectContent>
+                  {goalsForTransaction?.map(goal => (
+                    <SelectItem key={goal.id} value={goal.id}>
+                      <div className="flex flex-col">
+                        <span>{goal.name} {!goal.isOwner && "(Compartilhada)"}</span>
+                        <span className="text-xs text-muted-foreground">
+                          {formatCurrency(goal.currentAmount)} / {formatCurrency(goal.targetAmount)}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.goalId && <p className="text-sm text-red-500">{errors.goalId.message}</p>}
+
+              {selectedGoal && (
+                <div className="text-sm text-muted-foreground bg-muted p-2 rounded">
+                  <p>Saldo da meta: <span className="font-medium">{formatCurrency(selectedGoal.currentAmount)}</span></p>
+                  <p>Objetivo: <span className="font-medium">{formatCurrency(selectedGoal.targetAmount)}</span></p>
+                </div>
+              )}
+
+              {isWithdrawExceedsBalance && (
+                <div className="flex items-center gap-2 text-sm text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950 p-2 rounded border border-amber-200 dark:border-amber-800">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>O valor solicitado excede o saldo da meta ({formatCurrency(selectedGoal?.currentAmount || 0)})</span>
+                </div>
+              )}
             </div>
           )}
 

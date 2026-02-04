@@ -16,6 +16,13 @@ export function useGoals(params?: GoalQueryParams) {
   });
 }
 
+export function useGoalsForTransaction() {
+  return useQuery({
+    queryKey: ["goalsForTransaction"],
+    queryFn: () => goalsService.getForTransaction(),
+  });
+}
+
 export function useCreateGoal() {
   const queryClient = useQueryClient();
 

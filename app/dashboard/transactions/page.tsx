@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/table";
 import { formatCurrency, formatDate } from "@/lib/utils/format";
 import { Transaction, TransactionType, TransactionTypeLabels } from "@/lib/types";
-import { Plus, Pencil, Trash2, Eye } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, Target } from "lucide-react";
 import { TransactionDialog } from "@/components/transactions/transaction-dialog";
 import {
   AlertDialog,
@@ -67,7 +67,15 @@ export default function TransactionsPage() {
         return "bg-red-500 hover:bg-red-600";
       case TransactionType.Transfer:
         return "bg-blue-500 hover:bg-blue-600";
+      case TransactionType.GoalDeposit:
+        return "bg-purple-500 hover:bg-purple-600";
+      case TransactionType.GoalWithdraw:
+        return "bg-amber-500 hover:bg-amber-600";
     }
+  };
+
+  const isGoalTransaction = (type: TransactionType) => {
+    return type === TransactionType.GoalDeposit || type === TransactionType.GoalWithdraw;
   };
 
   const getViewContextLabel = () => {
@@ -130,7 +138,16 @@ export default function TransactionsPage() {
                   <TableCell className="font-medium">
                     {transaction.description}
                   </TableCell>
-                  <TableCell>{transaction.categoryName}</TableCell>
+                  <TableCell>
+                    {isGoalTransaction(transaction.type) && transaction.goalName ? (
+                      <div className="flex items-center gap-1">
+                        <Target className="h-3 w-3 text-purple-500" />
+                        <span className="text-purple-600 dark:text-purple-400">Meta: {transaction.goalName}</span>
+                      </div>
+                    ) : (
+                      transaction.categoryName
+                    )}
+                  </TableCell>
                   <TableCell>{transaction.accountName}</TableCell>
                   {isViewingAll && (
                     <TableCell>
@@ -146,12 +163,14 @@ export default function TransactionsPage() {
                   </TableCell>
                   <TableCell
                     className={`text-right font-bold ${
-                      transaction.type === TransactionType.Income
+                      transaction.type === TransactionType.Income || transaction.type === TransactionType.GoalWithdraw
                         ? "text-green-500"
+                        : transaction.type === TransactionType.Transfer
+                        ? "text-blue-500"
                         : "text-red-500"
                     }`}
                   >
-                    {transaction.type === TransactionType.Income ? "+" : "-"}
+                    {transaction.type === TransactionType.Income || transaction.type === TransactionType.GoalWithdraw ? "+" : "-"}
                     {formatCurrency(transaction.amount)}
                   </TableCell>
                   {canEdit && (
